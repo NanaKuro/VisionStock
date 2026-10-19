@@ -1,25 +1,25 @@
 @extends('layouts.guest', ['title' => 'Registrasi'])
 
 @section('content')
-    <main class="grid min-h-screen lg:grid-cols-2">
-        <div class="relative hidden min-h-screen overflow-hidden lg:block">
+    <main class="grid min-h-dvh lg:grid-cols-[47.2fr_52.8fr]">
+        <div class="relative hidden min-h-dvh overflow-hidden lg:block">
             <img class="absolute inset-0 size-full object-cover" src="{{ asset('images/image-login-regis.png') }}" alt="Rak persediaan di toko">
         </div>
 
-        <section class="flex min-h-screen items-center justify-center px-6 py-12 sm:px-12 lg:px-16 xl:px-24">
-            <div class="w-full max-w-xl">
-                <a class="mb-8 inline-block text-sm font-semibold text-brand-ink/75 hover:text-brand-ink" href="{{ route('home') }}">← Kembali ke halaman utama</a>
-                <h1 class="mb-10 text-5xl font-bold tracking-tight sm:text-6xl">Registrasi</h1>
+        <section class="flex min-h-dvh items-center justify-center px-4 py-10 sm:px-8 lg:px-8 xl:px-12">
+            <div class="w-full max-w-[632px]">
+                <a class="mb-8 inline-block min-h-11 content-center text-sm font-semibold text-brand-ink/75 hover:text-brand-ink" href="{{ route('home') }}">← Kembali ke halaman utama</a>
+                <h1 class="mb-10 text-[clamp(1.75rem,3.4vw,3rem)] font-bold tracking-tight">Registrasi</h1>
 
                 <form class="space-y-6" action="{{ route('register.store') }}" method="POST">
                     @csrf
                     <div>
-                        <label class="mb-3 block text-xl font-semibold" for="identifier">Username/Email</label>
+                        <label class="mb-3 block text-xl font-bold sm:text-2xl" for="identifier">Username/Email</label>
                         <input
                             @class([
-                                'w-full rounded-2xl border bg-transparent px-5 py-4 text-base outline-none transition placeholder:text-brand-ink/45 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/30',
-                                'border-red-800' => $errors->has('identifier'),
-                                'border-brand-ink/80' => ! $errors->has('identifier'),
+                                'h-[55px] w-full rounded-card border bg-transparent px-6 text-base outline-none transition placeholder:text-brand-muted focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/30',
+                                'border-brand-danger' => $errors->has('identifier'),
+                                'border-brand-lineart' => ! $errors->has('identifier'),
                             ])
                             id="identifier"
                             name="identifier"
@@ -34,17 +34,17 @@
                             @endif
                         >
                         @error('identifier')
-                            <p class="mt-2 text-sm font-medium text-red-800" id="identifier-error" role="alert">{{ $message }}</p>
+                            <p class="mt-2 text-sm font-medium text-brand-danger" id="identifier-error" role="alert">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <div>
-                        <label class="mb-3 block text-xl font-semibold" for="password">Password</label>
+                        <label class="mb-3 block text-xl font-bold sm:text-2xl" for="password">Password</label>
                         <input
                             @class([
-                                'w-full rounded-2xl border bg-transparent px-5 py-4 text-base outline-none transition placeholder:text-brand-ink/45 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/30',
-                                'border-red-800' => $errors->has('password'),
-                                'border-brand-ink/80' => ! $errors->has('password'),
+                                'h-[55px] w-full rounded-card border bg-transparent px-6 text-base outline-none transition placeholder:text-brand-muted focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/30',
+                                'border-brand-danger' => $errors->has('password'),
+                                'border-brand-lineart' => ! $errors->has('password'),
                             ])
                             id="password"
                             name="password"
@@ -55,19 +55,19 @@
                             required
                             aria-describedby="password-hint{{ $errors->has('password') ? ' password-error' : '' }}"
                         >
-                        <p class="mt-2 text-sm text-brand-ink/65" id="password-hint">Password minimal 8 karakter</p>
+                        <p class="mt-2 text-sm text-brand-muted" id="password-hint">Password minimal 8 karakter</p>
                         @error('password')
-                            <p class="mt-2 text-sm font-medium text-red-800" id="password-error" role="alert">{{ $message }}</p>
+                            <p class="mt-2 text-sm font-medium text-brand-danger" id="password-error" role="alert">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <div>
-                        <label class="mb-3 block text-xl font-semibold" for="password_confirmation">Ulangi Password</label>
+                        <label class="mb-3 block text-xl font-bold sm:text-2xl" for="password_confirmation">Ulangi Password</label>
                         <input
                             @class([
-                                'w-full rounded-2xl border bg-transparent px-5 py-4 text-base outline-none transition placeholder:text-brand-ink/45 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/30',
-                                'border-red-800' => $errors->has('password'),
-                                'border-brand-ink/80' => ! $errors->has('password'),
+                                'h-[55px] w-full rounded-card border bg-transparent px-6 text-base outline-none transition placeholder:text-brand-muted focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/30',
+                                'border-brand-danger' => $errors->has('password'),
+                                'border-brand-lineart' => ! $errors->has('password'),
                             ])
                             id="password_confirmation"
                             name="password_confirmation"
@@ -81,13 +81,13 @@
                             @endif
                         >
                         @error('password')
-                            <p class="mt-2 text-sm font-medium text-red-800" id="password-confirmation-error" role="alert">{{ $message }}</p>
+                            <p class="mt-2 text-sm font-medium text-brand-danger" id="password-confirmation-error" role="alert">{{ $message }}</p>
                         @enderror
                     </div>
 
-                    <div class="flex flex-wrap justify-end gap-3 pt-1">
-                        <button class="min-w-40 rounded-full bg-brand-primary px-7 py-3 text-lg font-bold text-white transition hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-ink" type="submit">Daftar</button>
-                        <a class="min-w-40 rounded-full border-2 border-brand-primary px-7 py-3 text-center text-lg font-bold text-brand-ink transition hover:bg-white/30 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-ink" href="{{ route('login') }}">Masuk</a>
+                    <div class="flex flex-col gap-3 pt-1 sm:flex-row sm:justify-end sm:gap-6">
+                        <button class="min-h-11 w-full rounded-card bg-brand-primary px-7 py-2 text-lg font-bold text-white transition hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-ink sm:w-auto sm:min-w-[8.4375rem]" type="submit">Daftar</button>
+                        <a class="inline-flex min-h-11 w-full items-center justify-center rounded-card border-2 border-brand-primary px-7 py-2 text-lg font-bold text-brand-ink transition hover:bg-white/30 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-ink sm:w-auto sm:min-w-[8.6875rem]" href="{{ route('login') }}">Masuk</a>
                     </div>
                 </form>
             </div>

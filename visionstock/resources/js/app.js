@@ -1,12 +1,22 @@
 const menuButtons = document.querySelectorAll('[data-menu-button]');
 const sidebar = document.querySelector('[data-sidebar]');
 const overlay = document.querySelector('[data-sidebar-overlay]');
+const menuOpener = document.querySelector('[data-menu-button]:not([data-menu-close])');
+const menuCloser = document.querySelector('[data-menu-close]');
+const desktopSidebar = window.matchMedia('(min-width: 1024px)');
 
-function setSidebarOpen(isOpen) {
+function setSidebarOpen(isOpen, restoreFocus = true) {
     sidebar?.classList.toggle('translate-x-0', isOpen);
     sidebar?.classList.toggle('-translate-x-full', !isOpen);
     overlay?.classList.toggle('hidden', !isOpen);
-    menuButtons.forEach((button) => button.setAttribute('aria-expanded', String(isOpen)));
+    document.body.classList.toggle('overflow-hidden', isOpen);
+    menuOpener?.setAttribute('aria-expanded', String(isOpen));
+
+    if (isOpen) {
+        menuCloser?.focus();
+    } else if (restoreFocus && !desktopSidebar.matches) {
+        menuOpener?.focus();
+    }
 }
 
 menuButtons.forEach((button) => {
@@ -18,6 +28,42 @@ menuButtons.forEach((button) => {
 });
 
 overlay?.addEventListener('click', () => setSidebarOpen(false));
+desktopSidebar.addEventListener('change', (event) => {
+    if (event.matches) {
+        setSidebarOpen(false, false);
+    }
+});
+
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && sidebar && !sidebar.classList.contains('-translate-x-full')) {
+        setSidebarOpen(false);
+    }
+});
+
+const searchForm = document.querySelector('[data-topbar-search]');
+const searchInput = searchForm?.querySelector('[data-search-input]');
+const searchToggle = searchForm?.querySelector('[data-search-toggle]');
+
+searchToggle?.addEventListener('click', (event) => {
+    if (window.matchMedia('(min-width: 768px)').matches || !searchInput || !searchInput.classList.contains('hidden')) {
+        return;
+    }
+
+    event.preventDefault();
+    searchInput.classList.remove('hidden');
+    searchInput.classList.add('block', 'absolute', 'right-4', 'top-full', 'mt-2', 'z-40', 'w-[min(70vw,20rem)]', 'shadow-lg');
+    searchToggle.setAttribute('aria-expanded', 'true');
+    searchInput.focus();
+});
+
+searchInput?.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+        searchInput.classList.add('hidden');
+        searchInput.classList.remove('block', 'absolute', 'right-4', 'top-full', 'mt-2', 'z-40', 'w-[min(70vw,20rem)]', 'shadow-lg');
+        searchToggle?.setAttribute('aria-expanded', 'false');
+        searchToggle?.focus();
+    }
+});
 
 const productDialog = document.querySelector('[data-product-dialog]');
 const productForm = document.querySelector('[data-product-form]');

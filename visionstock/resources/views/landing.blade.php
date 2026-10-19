@@ -2,31 +2,27 @@
 
 @section('content')
     <div class="min-h-screen">
-        <header class="flex h-24 items-center justify-between bg-brand-primary px-6 shadow-sm sm:px-10 lg:px-20">
-            <a class="text-2xl font-bold tracking-tight text-white sm:text-3xl" href="{{ route('home') }}">VisionStock</a>
-            <nav class="flex items-center gap-3 sm:gap-5" aria-label="Akun">
-                <a class="rounded-card px-4 py-2 font-semibold text-brand-ink transition hover:bg-white/25" href="{{ route('login') }}">Masuk</a>
-                <a class="rounded-card bg-brand-surface px-4 py-2 font-semibold text-brand-ink transition hover:bg-white" href="{{ route('register') }}">Daftar</a>
+        <header class="flex min-h-[106px] items-center justify-between bg-brand-primary px-4 shadow-[0_4px_5px_rgba(0,0,0,0.25)] sm:px-8 lg:px-16">
+            <a class="text-xl font-bold tracking-tight text-white sm:text-3xl" href="{{ route('home') }}">VisionStock</a>
+            <nav class="flex items-center gap-2 sm:gap-5" aria-label="Akun">
+                <a class="inline-flex min-h-11 items-center justify-center rounded-card px-3 text-sm font-bold text-brand-ink transition hover:bg-white/25 sm:w-28 sm:px-4 sm:text-base" href="{{ route('login') }}">Masuk</a>
+                <a class="inline-flex min-h-11 items-center justify-center rounded-card bg-brand-surface px-3 text-sm font-bold text-brand-ink transition hover:bg-white sm:w-28 sm:px-4 sm:text-base" href="{{ route('register') }}">Daftar</a>
             </nav>
         </header>
 
-        <main class="mx-auto grid min-h-[calc(100vh-6rem)] max-w-[1440px] items-center gap-10 px-6 py-12 sm:px-10 lg:grid-cols-[1fr_0.9fr] lg:px-20 lg:py-16">
-            <section class="max-w-2xl">
-                <h1 class="text-4xl font-bold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
+        <main class="mx-auto grid min-h-[calc(100dvh-6.625rem)] max-w-[1440px] items-center gap-8 px-4 py-8 sm:px-8 lg:grid-cols-[minmax(0,448fr)_minmax(0,661fr)] lg:gap-12 lg:px-16 lg:py-16">
+            <section class="max-w-2xl lg:pr-6">
+                <h1 class="text-[clamp(2rem,4vw,3.5rem)] font-bold leading-[1.11] tracking-tight">
                     Solusi<br class="hidden sm:block"> Permasalahan Stok
                 </h1>
-                <p class="mt-6 max-w-xl text-lg leading-8 text-brand-ink/80">
-                    Catat persediaan dan transaksi, pantau kebutuhan produk, lalu rencanakan pengisian stok dengan lebih mudah.
-                </p>
-                <div class="mt-9 flex flex-wrap gap-4">
-                    <a class="rounded-card bg-brand-primary px-7 py-3.5 font-semibold text-white shadow-sm transition hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-ink" href="{{ route('login') }}">Masuk</a>
-                    <a class="rounded-card border-2 border-brand-primary px-7 py-3.5 font-semibold text-brand-ink transition hover:bg-white/30 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-ink" href="{{ route('register') }}">Daftar</a>
+                <div class="mt-8 flex flex-wrap gap-4">
+                    <a class="inline-flex min-h-11 w-full items-center justify-center rounded-card bg-brand-primary px-7 py-3 font-bold text-white shadow-sm transition hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-ink sm:w-auto sm:min-w-[15.4375rem]" href="{{ route('register') }}">Coba Sekarang</a>
                 </div>
             </section>
 
-            <div class="overflow-hidden rounded-[2rem] shadow-lg">
+            <div class="mx-auto w-full max-w-[661px] overflow-hidden rounded-card shadow-[0_8px_8px_rgba(0,0,0,0.25)]">
                 <img
-                    class="aspect-[4/3] w-full object-cover lg:aspect-[1/1.08]"
+                    class="aspect-square w-full object-cover"
                     src="{{ asset('images/image-landing.png') }}"
                     alt="Rak penyimpanan produk di toko"
                 >

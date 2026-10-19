@@ -1,45 +1,32 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="mx-auto max-w-6xl">
-        <p class="mb-2 text-sm font-semibold uppercase tracking-[0.16em] text-brand-ink/65">VisionStock</p>
-        <h1 class="text-3xl font-semibold tracking-tight sm:text-4xl">{{ $title }}</h1>
-
+    <div class="mx-auto w-full max-w-[1200px]">
         @if ($title === 'Dashboard')
-            <section class="mt-8 rounded-card bg-brand-primary p-6 text-white shadow-sm sm:p-8 lg:p-10" aria-labelledby="welcome-heading">
-                <h2 id="welcome-heading" class="text-2xl font-semibold sm:text-3xl">Halo, Admin! Ingin melakukan apa hari ini?</h2>
-                <p class="mt-3 max-w-2xl leading-7 text-white/85">
-                    Kelola data stok, pantau rekomendasi pengisian, dan catat transaksi dalam satu tempat.
-                </p>
-            </section>
+            <section class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3" aria-label="Ringkasan data">
+                <article class="flex min-h-64 flex-col justify-center rounded-card bg-brand-primary p-6 text-white shadow-sm sm:col-span-2 sm:min-h-[19rem] sm:p-8 lg:p-12">
+                    <h1 id="welcome-heading" class="text-[clamp(1.75rem,3.4vw,3rem)] font-bold leading-tight">Halo, Admin!</h1>
+                    <p class="mt-4 text-[clamp(1.25rem,2.2vw,2rem)] font-bold leading-tight">Ingin melakukan apa hari ini?</p>
+                </article>
 
-            <section class="mt-8" aria-label="Ringkasan data">
-                <div class="grid gap-5 sm:grid-cols-2">
-                    <article class="rounded-card bg-white/85 p-6 shadow-sm sm:p-7">
-                        <h2 class="text-base font-semibold text-brand-ink/75">Total Riwayat Transaksi</h2>
-                        <p class="mt-4 text-4xl font-bold tracking-tight">{{ number_format($metrics['transaction_records'], 0, ',', '.') }}</p>
-                        <p class="mt-2 text-sm text-brand-ink/65">Catatan transaksi tersimpan</p>
+                @foreach ([
+                    ['label' => 'Total Riwayat Transaksi', 'value' => $metrics['transaction_records']],
+                    ['label' => 'Total Produk', 'value' => $metrics['products']],
+                    ['label' => 'Jumlah Produk', 'value' => $metrics['units_in_stock']],
+                    ['label' => 'Jumlah Transaksi', 'value' => $metrics['units_sold']],
+                ] as $metric)
+                    <article class="flex flex-col gap-3" aria-label="{{ $metric['label'] }}">
+                        <h2 class="min-h-12 text-center text-lg font-bold leading-tight sm:min-h-16 sm:text-xl">{{ $metric['label'] }}</h2>
+                        <div class="flex aspect-[264/204] min-h-40 items-center justify-center rounded-card bg-brand-primary p-5 text-white shadow-sm">
+                            <p class="text-[clamp(2rem,4vw,3.5rem)] font-bold tracking-tight">{{ number_format($metric['value'], 0, ',', '.') }}</p>
+                        </div>
                     </article>
-                    <article class="rounded-card bg-white/85 p-6 shadow-sm sm:p-7">
-                        <h2 class="text-base font-semibold text-brand-ink/75">Total Produk</h2>
-                        <p class="mt-4 text-4xl font-bold tracking-tight">{{ number_format($metrics['products'], 0, ',', '.') }}</p>
-                        <p class="mt-2 text-sm text-brand-ink/65">Jenis produk terdaftar</p>
-                    </article>
-                    <article class="rounded-card bg-white/85 p-6 shadow-sm sm:p-7">
-                        <h2 class="text-base font-semibold text-brand-ink/75">Jumlah Produk</h2>
-                        <p class="mt-4 text-4xl font-bold tracking-tight">{{ number_format($metrics['units_in_stock'], 0, ',', '.') }}</p>
-                        <p class="mt-2 text-sm text-brand-ink/65">Total unit stok saat ini</p>
-                    </article>
-                    <article class="rounded-card bg-white/85 p-6 shadow-sm sm:p-7">
-                        <h2 class="text-base font-semibold text-brand-ink/75">Jumlah Transaksi</h2>
-                        <p class="mt-4 text-4xl font-bold tracking-tight">{{ number_format($metrics['units_sold'], 0, ',', '.') }}</p>
-                        <p class="mt-2 text-sm text-brand-ink/65">Unit produk terjual</p>
-                    </article>
-                </div>
+                @endforeach
             </section>
         @else
-            <section class="mt-8 rounded-card bg-white/80 p-6 shadow-sm sm:p-8">
-                <p class="text-brand-ink/75">Halaman ini akan dilengkapi pada tahap berikutnya.</p>
+            <section class="rounded-card bg-white/80 p-6 shadow-sm sm:p-8">
+                <h1 class="text-[clamp(1.75rem,3.4vw,3rem)] font-bold tracking-tight">{{ $title }}</h1>
+                <p class="mt-6 text-brand-ink/75">Halaman ini akan dilengkapi pada tahap berikutnya.</p>
             </section>
         @endif
     </div>

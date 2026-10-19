@@ -7,50 +7,72 @@
         <title>{{ $title }} | VisionStock</title>
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="min-h-screen bg-brand-surface font-sans text-brand-ink antialiased">
-        <div class="min-h-screen">
-            <header class="relative z-30 flex h-[104px] items-center gap-6 bg-brand-primary px-5 md:px-8">
+    <body class="min-h-dvh bg-brand-surface font-sans text-brand-ink antialiased">
+        <div class="min-h-dvh">
+            <header class="sticky top-0 z-30 flex min-h-[104px] flex-wrap items-center gap-3 bg-brand-primary px-4 py-3 shadow-[0_4px_5px_rgba(0,0,0,0.25)] md:gap-6 md:px-8">
                 <button
-                    class="inline-flex size-12 shrink-0 items-center justify-center rounded-xl text-brand-ink transition hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-ink"
+                    class="inline-flex size-11 shrink-0 items-center justify-center rounded-xl text-white transition hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white lg:hidden"
                     type="button"
                     aria-label="Buka menu navigasi"
                     aria-controls="main-sidebar"
                     aria-expanded="false"
                     data-menu-button
                 >
-                    <svg aria-hidden="true" class="size-7" viewBox="0 0 32 32" fill="none">
+                    <svg aria-hidden="true" class="size-8" viewBox="0 0 32 32" fill="none">
                         <path d="M5 8h22M5 16h22M5 24h22" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
                     </svg>
                 </button>
 
-                <a class="flex items-center gap-3 text-2xl font-semibold tracking-tight text-brand-ink" href="{{ route('dashboard') }}">
-                    <span class="flex size-11 items-center justify-center rounded-xl bg-white/30">
-                        <svg aria-hidden="true" class="size-7" viewBox="0 0 32 32" fill="none">
-                            <path d="M5 9.5 16 4l11 5.5v13L16 28 5 22.5v-13Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-                            <path d="m5.5 9.5 10.5 5 10.5-5M16 15v12" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-                        </svg>
-                    </span>
-                    <span>VisionStock</span>
+                <a class="inline-flex size-11 shrink-0 items-center justify-center rounded-xl text-white transition hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white" href="{{ route('dashboard') }}" aria-label="Beranda">
+                    <svg aria-hidden="true" class="size-8" viewBox="0 0 32 32" fill="none">
+                        <path d="m4 14 12-10 12 10v14H19v-9h-6v9H4V14Z" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
+                    </svg>
                 </a>
 
-                <div class="ml-auto hidden items-center gap-3 sm:flex">
-                    <span class="text-sm font-medium text-brand-ink/80">Admin</span>
-                    <span class="flex size-11 items-center justify-center rounded-full bg-brand-ink text-sm font-semibold text-white" aria-hidden="true">A</span>
-                </div>
+                <a class="text-xl font-bold tracking-tight text-white sm:text-2xl" href="{{ route('dashboard') }}">VisionStock</a>
+
+                @if (request()->routeIs('stok.index'))
+                    <form class="ml-auto flex items-center gap-2 sm:gap-4" action="{{ route('stok.index') }}" method="GET" data-topbar-search>
+                        <label class="sr-only" for="topbar-search">Cari</label>
+                        <input
+                            class="hidden h-11 w-40 rounded-card border border-brand-lineart/25 bg-brand-surface px-4 text-base text-brand-ink placeholder:text-brand-muted focus:outline-2 focus:outline-offset-2 focus:outline-white md:block lg:w-56"
+                            id="topbar-search"
+                            name="search"
+                            type="search"
+                            value="{{ request('search') }}"
+                            placeholder="Cari"
+                            data-search-input
+                        >
+                        @if (request()->filled('sort'))
+                            <input type="hidden" name="sort" value="{{ request('sort') }}">
+                        @endif
+                        @if (request()->filled('category_id'))
+                            <input type="hidden" name="category_id" value="{{ request('category_id') }}">
+                        @endif
+                        <button class="inline-flex min-h-11 items-center gap-2 rounded-card bg-brand-surface px-4 text-base font-bold text-brand-ink transition hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white" type="submit" aria-label="Cari" data-search-toggle>
+                            <svg aria-hidden="true" class="size-6" viewBox="0 0 24 24" fill="none">
+                                <circle cx="10.8" cy="10.8" r="6.8" stroke="currentColor" stroke-width="2"/>
+                                <path d="m16 16 4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            <span class="hidden md:inline">Cari</span>
+                        </button>
+                        <a class="inline-flex min-h-11 items-center justify-center rounded-card bg-brand-surface px-3 text-sm font-bold text-brand-ink transition hover:bg-white sm:px-5 sm:text-base" href="{{ route('stok.import') }}">Impor Stok</a>
+                    </form>
+                @endif
             </header>
 
-            <div class="flex min-h-[calc(100vh-104px)]">
-                <div class="fixed inset-0 z-30 hidden bg-brand-ink/40 md:hidden" data-sidebar-overlay></div>
+            <div class="flex min-h-[calc(100dvh-104px)]">
+                <div class="fixed inset-0 z-30 hidden bg-black/45 lg:hidden" data-sidebar-overlay></div>
 
                 <aside
                     id="main-sidebar"
-                    class="fixed inset-y-0 left-0 z-40 flex w-[min(367px,86vw)] -translate-x-full flex-col bg-brand-primary px-5 pb-6 pt-5 transition-transform duration-200 md:static md:min-h-[calc(100vh-104px)] md:w-[367px] md:shrink-0 md:translate-x-0 md:px-8 md:pb-8"
+                    class="fixed inset-y-0 left-0 z-40 flex w-[min(367px,86vw)] -translate-x-full flex-col bg-brand-primary px-5 pb-6 pt-5 shadow-[4px_0_5px_rgba(0,0,0,0.25)] transition-transform duration-200 lg:sticky lg:top-[104px] lg:min-h-[calc(100dvh-104px)] lg:w-[clamp(15rem,25.5vw,22.9375rem)] lg:shrink-0 lg:translate-x-0 lg:px-8 lg:pb-8 lg:pt-8"
                     data-sidebar
                 >
-                    <div class="mb-8 flex items-center justify-between md:hidden">
-                        <span class="text-lg font-semibold">Menu</span>
+                    <div class="mb-8 flex items-center justify-between lg:justify-center">
+                        <h2 class="text-2xl font-bold text-white sm:text-[clamp(1.25rem,2.2vw,2rem)]">{{ $title }}</h2>
                         <button
-                            class="rounded-lg p-2 hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-brand-ink"
+                            class="inline-flex size-11 items-center justify-center rounded-lg text-white hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-white lg:hidden"
                             type="button"
                             aria-label="Tutup menu navigasi"
                             data-menu-button
@@ -62,10 +84,9 @@
                         </button>
                     </div>
 
-                    <nav class="space-y-3" aria-label="Navigasi utama">
+                    <nav class="space-y-3 lg:space-y-16" aria-label="Navigasi utama">
                         @php
                             $navigation = [
-                                ['label' => 'Dashboard', 'route' => 'dashboard', 'icon' => 'grid'],
                                 ['label' => 'Data Stok', 'route' => 'stok.index', 'icon' => 'box'],
                                 ['label' => 'Analisis Stok', 'route' => 'analisis.index', 'icon' => 'chart'],
                                 ['label' => 'Riwayat Transaksi', 'route' => 'transaksi.index', 'icon' => 'clock'],
@@ -77,13 +98,13 @@
                             <a
                                 href="{{ route($item['route']) }}"
                                 @class([
-                                    'flex min-h-[72px] items-center gap-4 rounded-2xl px-5 text-base font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-ink md:px-6',
-                                    'bg-brand-surface text-brand-ink' => request()->routeIs($item['route']),
-                                    'text-brand-ink/80 hover:bg-white/20 hover:text-brand-ink' => ! request()->routeIs($item['route']),
+                                    'flex min-h-[72px] items-center gap-4 rounded-card px-4 text-base font-bold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white md:gap-6 md:px-6 md:text-lg lg:text-[clamp(1rem,1.7vw,1.5rem)]',
+                                    'bg-brand-surface text-brand-ink' => request()->routeIs($item['route']) || ($item['route'] === 'stok.index' && request()->routeIs('stok.import')),
+                                    'text-white hover:bg-white/20' => ! request()->routeIs($item['route']) && ! ($item['route'] === 'stok.index' && request()->routeIs('stok.import')),
                                 ])
-                                @if (request()->routeIs($item['route'])) aria-current="page" @endif
+                                @if (request()->routeIs($item['route']) || ($item['route'] === 'stok.index' && request()->routeIs('stok.import'))) aria-current="page" @endif
                             >
-                                <svg aria-hidden="true" class="size-6 shrink-0" viewBox="0 0 24 24" fill="none">
+                                <svg aria-hidden="true" class="size-8 shrink-0 md:size-10" viewBox="0 0 24 24" fill="none">
                                     @switch($item['icon'])
                                         @case('grid')
                                             <rect x="3.5" y="3.5" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
@@ -113,17 +134,17 @@
                         @endforeach
                     </nav>
 
-                    <div class="mt-auto flex items-center gap-3 border-t border-brand-ink/15 pt-6">
-                        <span class="flex size-11 items-center justify-center rounded-full bg-brand-surface text-sm font-semibold">A</span>
-                        <span class="text-sm font-semibold">Admin</span>
+                    <div class="mt-auto flex flex-wrap items-center gap-3 border-t border-white/20 pt-6 md:gap-4">
+                        <span class="flex size-15 items-center justify-center rounded-full bg-brand-surface text-lg font-semibold text-brand-ink" aria-hidden="true">A</span>
+                        <span class="text-xl font-bold text-white lg:text-[clamp(1.25rem,2.2vw,2rem)]">Admin</span>
                         <form class="ml-auto" action="{{ route('logout') }}" method="POST">
                             @csrf
-                            <button class="rounded-xl px-3 py-2 text-sm font-semibold text-brand-ink transition hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-brand-ink" type="submit">Keluar</button>
+                            <button class="min-h-11 rounded-xl px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-white" type="submit">Keluar</button>
                         </form>
                     </div>
                 </aside>
 
-                <main class="min-w-0 flex-1 px-5 py-8 md:px-8 md:py-10">
+                <main class="min-w-0 flex-1 px-4 py-6 sm:px-6 md:px-8 md:py-10 xl:px-16">
                     @yield('content')
                 </main>
             </div>
