@@ -44,18 +44,20 @@ Database lokal menggunakan SQLite (`database\database.sqlite`). Untuk lingkungan
 
 Pada halaman **Analisis Stok**, pilih **Simpan Riwayat** dan konfirmasikan untuk menyimpan snapshot stok serta rekomendasi. Daftar dan detail snapshot tersedia di **Pengaturan > Riwayat Analisis**. Riwayat tidak berubah saat data produk diperbarui.
 
-## Deploy gratis ke Render
+## Deploy ke Railway
 
-VisionStock dapat dijalankan sebagai Docker Web Service pada **Render Free**. Paket gratis tidak memerlukan Workers Paid, tetapi layanan akan tidur setelah 15 menit tanpa trafik dan perlu sekitar satu menit untuk aktif kembali. Filesystem container bersifat sementara; jangan gunakan SQLite atau penyimpanan file lokal untuk data yang harus bertahan. Render Postgres Free juga kedaluwarsa setelah 30 hari, jadi gunakan penyedia PostgreSQL eksternal dengan free tier yang sesuai dan Cloudflare R2 (atau object storage S3-compatible lain) untuk unggahan. Periksa kuota dan ketentuan penyedia; jangan menambahkan metode pembayaran bila tidak ingin ada biaya.
+Railway akan membangun Docker image dari `Dockerfile` di folder aplikasi. Karena aplikasi berada di subfolder repository, atur **Root Directory** service ke `/visionstock`; biarkan Railway mendeteksi Dockerfile secara otomatis. Container mendengarkan pada nilai `PORT` yang diberikan Railway (default `8080`) dan menyediakan health endpoint Laravel `/up`.
 
-1. Pastikan `render.yaml` di root repository terdeteksi Render Blueprint. Blueprint menunjuk ke `visionstock` sebagai root aplikasi dan memilih paket `free`.
-2. Siapkan PostgreSQL dan bucket object storage. Buat URL koneksi PostgreSQL yang menerima koneksi dari luar. Untuk R2, siapkan access key, secret key, nama bucket, endpoint `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`, dan public bucket URL/custom domain untuk `AWS_URL`.
-3. Saat membuat Blueprint, isi environment variables yang diminta Render:
+1. Buat project Railway dan tambahkan service dari repository GitHub ini. Pada **Settings > Source**, atur **Root Directory** ke `/visionstock`. Jangan mengisi build atau start command khusus; gunakan Dockerfile dan perintah `CMD` yang sudah disediakan.
+2. Pada **Settings > Networking**, buat domain publik untuk service. Atur variabel berikut pada tab **Variables**:
+   - `APP_ENV=production` dan `APP_DEBUG=false`.
    - `APP_KEY`: hasil `php artisan key:generate --show` (buat sekali dan jangan diganti).
-   - `APP_URL`: URL service Render setelah service dibuat, misalnya `https://visionstock.onrender.com`.
-   - `DB_URL`: URL koneksi PostgreSQL eksternal.
-   - `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_BUCKET`, `AWS_ENDPOINT`, dan `AWS_URL`: nilai object storage yang sudah disiapkan.
-4. Setelah service berhasil dibuat, atur `APP_URL` ke URL publik sebenarnya pada **Environment** settings, lalu jalankan migrasi satu kali dari lingkungan lokal yang dapat mengakses database:
+   - `APP_URL`: URL publik Railway, misalnya `https://<domain-service>.up.railway.app`.
+   - `DB_CONNECTION=pgsql`, `DB_SSLMODE=require`, dan `DB_URL`: URL PostgreSQL dari database Railway atau penyedia eksternal.
+   - `SESSION_DRIVER=cookie`, `SESSION_SECURE_COOKIE=true`, `CACHE_STORE=array`, dan `QUEUE_CONNECTION=sync`.
+   - Untuk berkas unggahan persisten, atur `FILESYSTEM_DISK=s3`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_BUCKET`, `AWS_ENDPOINT`, `AWS_URL`, `AWS_DEFAULT_REGION=auto`, dan `AWS_USE_PATH_STYLE_ENDPOINT=true` sesuai bucket R2/S3-compatible. Jangan mengandalkan filesystem container untuk menyimpan berkas.
+3. Pada pengaturan **Healthcheck Path**, isi `/up`. Pastikan Railway menggunakan port dari variabel `PORT`; Dockerfile mengatur Apache mengikuti port tersebut.
+4. Deploy service, lalu jalankan migrasi **satu kali** terhadap database yang dikonfigurasi dari lingkungan lokal yang memiliki Composer serta akses jaringan ke database:
 
    ```powershell
    $env:APP_ENV = "production"
@@ -66,6 +68,4 @@ VisionStock dapat dijalankan sebagai Docker Web Service pada **Render Free**. Pa
    php artisan migrate --force
    ```
 
-5. Render membangun image dari `visionstock/Dockerfile`. Apache mendengarkan pada port `10000` dan health check menggunakan `/up`. Setelah deploy, buka URL `.onrender.com`; kunjungan pertama setelah layanan tidur mungkin memerlukan waktu hingga sekitar satu menit.
-
-Konfigurasi Blueprint berada di `render.yaml`. Untuk menghindari biaya tak disengaja, pantau kuota dan batas pemakaian di Render serta penyedia database/object storage. Paket gratis cocok untuk demo/pengujian, bukan aplikasi produksi dengan jaminan uptime atau persistensi data.
+5. Setelah migrasi selesai, buka domain Railway dan periksa log service bila health check atau startup gagal. Paket, kuota, dan biaya Railway bergantung pada akun dan pemakaian; periksa halaman billing Railway dan layanan database/object storage yang digunakan.

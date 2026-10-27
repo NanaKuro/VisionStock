@@ -46,13 +46,11 @@ COPY --from=dependencies /var/www/html/bootstrap/cache/ ./bootstrap/cache/
 COPY --from=assets /app/public/build ./public/build
 
 RUN sed -ri 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/*.conf \
-    && sed -ri 's/Listen 80/Listen 10000/' /etc/apache2/ports.conf \
-    && sed -ri 's/<VirtualHost \*:80>/<VirtualHost *:10000>/' /etc/apache2/sites-available/*.conf \
     && printf '<Directory /var/www/html/public>\n    AllowOverride All\n    Require all granted\n</Directory>\n' > /etc/apache2/conf-available/laravel.conf \
     && a2enconf laravel \
     && mkdir -p storage/app/private storage/app/public storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs bootstrap/cache \
     && chown -R www-data:www-data storage bootstrap/cache
 
-EXPOSE 10000
+EXPOSE 8080
 
-CMD ["apache2-foreground"]
+CMD ["sh", "-c", "port=\"${PORT:-8080}\"; sed -ri \"s/Listen 80/Listen ${port}/\" /etc/apache2/ports.conf && sed -ri \"s/<VirtualHost \\\\*:80>/<VirtualHost *:${port}>/\" /etc/apache2/sites-available/000-default.conf && exec apache2-foreground"]
