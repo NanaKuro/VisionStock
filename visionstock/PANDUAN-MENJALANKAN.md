@@ -48,7 +48,7 @@ Pada halaman **Analisis Stok**, pilih **Simpan Riwayat** dan konfirmasikan untuk
 
 Project ini memakai Vercel Container Runtime melalui `Dockerfile.vercel`. Database SQLite dan penyimpanan file lokal tidak cocok untuk deployment karena filesystem instance Vercel tidak persisten. Siapkan database PostgreSQL atau MySQL eksternal dan bucket S3-compatible sebelum deploy.
 
-1. Import repository ke Vercel dan pastikan **Root Directory** menunjuk ke folder `visionstock` (folder yang berisi `Dockerfile.vercel`).
+1. Import repository ke Vercel dan pastikan **Root Directory** menunjuk ke folder `visionstock` (folder yang berisi `vercel.json` dan `Dockerfile.vercel`). `vercel.json` menetapkan Framework Preset ke `container`, agar Vercel tidak menjalankan build statis Vite atau mencari folder `dist`.
 2. Buat database PostgreSQL/MySQL dan bucket S3-compatible. Bucket harus dapat menyajikan file gambar produk dan invoice melalui URL publik, sesuai perilaku aplikasi saat ini.
 3. Isi Environment Variables berikut di **Project Settings > Environment Variables** untuk Production, Preview, dan Development sesuai kebutuhan:
    - `APP_NAME=VisionStock`, `APP_ENV=production`, `APP_DEBUG=false`, dan `APP_URL` dengan URL deployment.
