@@ -21,7 +21,7 @@
                 <h1 id="settings-heading" class="mb-8 text-[clamp(1.75rem,3.4vw,3rem)] font-bold tracking-tight">Profil dan Akun</h1>
                 <div class="flex w-full max-w-[511px] flex-col gap-4">
                     <a class="inline-flex min-h-12 items-center rounded-card bg-brand-primary px-6 text-lg font-bold text-white transition hover:brightness-95" href="{{ route('pengaturan.index', ['bagian' => 'profil']) }}">Edit Profil</a>
-                    <a class="inline-flex min-h-12 items-center rounded-card bg-brand-primary px-6 text-lg font-bold text-white transition hover:brightness-95" href="{{ route('pengaturan.index', ['bagian' => 'whatsapp']) }}">Hubungkan ke WhatsApp</a>
+                    <a class="inline-flex min-h-12 items-center rounded-card bg-brand-primary px-6 text-lg font-bold text-white transition hover:brightness-95" href="{{ route('pengaturan.riwayat-analisis.index') }}">Riwayat Analisis</a>
                 </div>
             </section>
         @elseif ($section === 'profil')
@@ -63,42 +63,6 @@
                     <div class="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end sm:gap-6">
                         <a class="inline-flex min-h-11 items-center justify-center rounded-card border border-brand-lineart/40 px-7 font-bold transition hover:bg-white/35" href="{{ route('pengaturan.index') }}">Kembali</a>
                         <button class="min-h-11 rounded-card bg-brand-primary px-7 font-bold text-white transition hover:brightness-95" type="submit">Simpan</button>
-                    </div>
-                </form>
-            </section>
-        @else
-            <section class="max-w-[945px]" aria-labelledby="whatsapp-heading">
-                <h1 id="whatsapp-heading" class="mb-8 text-[clamp(1.75rem,3.4vw,3rem)] font-bold tracking-tight">Hubungkan ke WhatsApp</h1>
-                @if ($user->whatsapp_number)
-                    <p class="mb-6 text-base text-brand-ink">
-                        Nomor tersimpan: <span class="font-bold">{{ $user->whatsapp_number }}</span>
-                        <span class="block text-sm text-brand-muted">WhatsApp belum terhubung.</span>
-                    </p>
-                @endif
-                <form class="grid gap-6" action="{{ route('pengaturan.whatsapp.save') }}" method="POST">
-                    @csrf
-                    @method('PUT')
-                    <div>
-                        <label class="mb-3 block text-lg font-bold" for="whatsapp-number">Nomor Telepon</label>
-                        <input
-                            class="h-[55px] w-full rounded-card border border-brand-lineart bg-transparent px-6 text-base outline-none placeholder:text-brand-muted focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/25"
-                            id="whatsapp-number"
-                            name="whatsapp_number"
-                            type="tel"
-                            value="{{ old('whatsapp_number', $user->whatsapp_number) }}"
-                            placeholder="+6281234567890"
-                            autocomplete="tel"
-                            pattern="\+[1-9][0-9]{7,14}"
-                            required
-                        >
-                        <p class="mt-2 text-sm text-brand-muted">Gunakan format internasional, misalnya +6281234567890.</p>
-                        @error('whatsapp_number')
-                            <p class="mt-2 text-sm text-brand-danger" role="alert">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    <div class="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end sm:gap-6">
-                        <a class="inline-flex min-h-11 items-center justify-center rounded-card border border-brand-lineart/40 px-7 font-bold transition hover:bg-white/35" href="{{ route('pengaturan.index') }}">Kembali</a>
-                        <button class="min-h-11 rounded-card bg-brand-primary px-7 font-bold text-white transition hover:brightness-95" type="submit">Kirim</button>
                     </div>
                 </form>
             </section>

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AnalysisController;
+use App\Http\Controllers\AnalysisHistoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SettingsController;
@@ -35,6 +36,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/stok/template', [StockImportController::class, 'template'])->name('stok.template');
 
     Route::get('/analisis', [AnalysisController::class, 'index'])->name('analisis.index');
+    Route::post('/analisis/riwayat', [AnalysisHistoryController::class, 'store'])->name('analisis.riwayat.store');
+    Route::get('/pengaturan/riwayat-analisis', [AnalysisHistoryController::class, 'index'])->name('pengaturan.riwayat-analisis.index');
+    Route::get('/pengaturan/riwayat-analisis/{history}', [AnalysisHistoryController::class, 'show'])->name('pengaturan.riwayat-analisis.show');
     Route::get('/transaksi', [TransactionController::class, 'index'])->name('transaksi.index');
     Route::get('/transaksi/impor', [TransactionImportController::class, 'index'])->name('transaksi.import');
     Route::post('/transaksi/impor', [TransactionImportController::class, 'import'])->name('transaksi.import.store');
@@ -42,5 +46,4 @@ Route::middleware('auth')->group(function () {
     Route::get('/transaksi/impor/template', [TransactionImportController::class, 'template'])->name('transaksi.import.template');
     Route::get('/pengaturan', [SettingsController::class, 'index'])->name('pengaturan.index');
     Route::put('/pengaturan/profil', [SettingsController::class, 'updateProfile'])->name('pengaturan.profil.update');
-    Route::put('/pengaturan/whatsapp', [SettingsController::class, 'saveWhatsAppNumber'])->name('pengaturan.whatsapp.save');
 });

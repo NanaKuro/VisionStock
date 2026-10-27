@@ -11,7 +11,7 @@ class SettingsTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_settings_displays_profile_and_whatsapp_sections(): void
+    public function test_settings_displays_profile_and_analysis_history_sections(): void
     {
         $user = User::factory()->create();
 
@@ -20,16 +20,17 @@ class SettingsTest extends TestCase
             ->assertOk()
             ->assertSee('Profil dan Akun')
             ->assertSee('Edit Profil')
-            ->assertSee('Hubungkan ke WhatsApp');
+            ->assertSee('Riwayat Analisis');
 
         $this->get(route('pengaturan.index', ['bagian' => 'profil']))
             ->assertOk()
             ->assertSee('Atur Ulang Password')
             ->assertSee('Konfirmasi Password');
 
-        $this->get(route('pengaturan.index', ['bagian' => 'whatsapp']))
+        $this->get(route('pengaturan.riwayat-analisis.index'))
             ->assertOk()
-            ->assertSee('Nomor Telepon');
+            ->assertSee('Riwayat analisis belum ada')
+            ->assertSee('Simpan hasil analisis dari halaman Analisis Stok.');
     }
 
     public function test_user_can_update_profile_and_password(): void
@@ -96,41 +97,5 @@ class SettingsTest extends TestCase
             ])
             ->assertRedirect(route('pengaturan.index', ['bagian' => 'profil']))
             ->assertSessionHasErrors(['email', 'password']);
-    }
-
-    public function test_user_can_save_a_valid_international_whatsapp_number_without_false_connection_status(): void
-    {
-        $user = User::factory()->create();
-
-        $this->actingAs($user)
-            ->put(route('pengaturan.whatsapp.save'), [
-                'whatsapp_number' => '+6281234567890',
-            ])
-            ->assertRedirect(route('pengaturan.index', ['bagian' => 'whatsapp']))
-            ->assertSessionHas('status');
-
-        $this->assertDatabaseHas('users', [
-            'id' => $user->id,
-            'whatsapp_number' => '+6281234567890',
-        ]);
-
-        $this->get(route('pengaturan.index', ['bagian' => 'whatsapp']))
-            ->assertOk()
-            ->assertSee('WhatsApp belum terhubung.');
-    }
-
-    public function test_whatsapp_number_must_use_international_format(): void
-    {
-        $user = User::factory()->create();
-
-        $this->actingAs($user)
-            ->from(route('pengaturan.index', ['bagian' => 'whatsapp']))
-            ->put(route('pengaturan.whatsapp.save'), [
-                'whatsapp_number' => '081234567890',
-            ])
-            ->assertRedirect(route('pengaturan.index', ['bagian' => 'whatsapp']))
-            ->assertSessionHasErrors('whatsapp_number');
-
-        $this->assertNull($user->fresh()->whatsapp_number);
     }
 }

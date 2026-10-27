@@ -17,7 +17,7 @@ class SettingsController extends Controller
         abort_unless($user instanceof User, 403);
 
         $section = $request->validate([
-            'bagian' => ['nullable', Rule::in(['profil', 'whatsapp'])],
+            'bagian' => ['nullable', Rule::in(['profil'])],
         ])['bagian'] ?? 'menu';
 
         return view('pengaturan.index', [
@@ -63,26 +63,5 @@ class SettingsController extends Controller
         return redirect()
             ->route('pengaturan.index', ['bagian' => 'profil'])
             ->with('status', 'Profil berhasil diperbarui.');
-    }
-
-    public function saveWhatsAppNumber(Request $request): RedirectResponse
-    {
-        $user = $request->user();
-
-        abort_unless($user instanceof User, 403);
-
-        $data = $request->validate([
-            'whatsapp_number' => ['required', 'string', 'regex:/^\+[1-9]\d{7,14}$/'],
-        ], [
-            'whatsapp_number.required' => 'Nomor Telepon wajib diisi.',
-            'whatsapp_number.regex' => 'Gunakan format internasional, misalnya +6281234567890.',
-        ]);
-
-        $user->whatsapp_number = $data['whatsapp_number'];
-        $user->save();
-
-        return redirect()
-            ->route('pengaturan.index', ['bagian' => 'whatsapp'])
-            ->with('status', 'Nomor WhatsApp berhasil disimpan. Koneksi WhatsApp belum aktif karena layanan pengiriman belum dikonfigurasi.');
     }
 }

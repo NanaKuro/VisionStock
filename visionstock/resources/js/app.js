@@ -271,3 +271,34 @@ const transactionSuccess = document.querySelector('[data-transaction-success]');
 if (transactionSuccess instanceof HTMLDialogElement) {
     transactionSuccess.showModal();
 }
+
+const analysisHistoryConfirm = document.querySelector('[data-analysis-history-confirm]');
+document.querySelector('[data-analysis-history-open]')?.addEventListener('click', () => {
+    if (analysisHistoryConfirm instanceof HTMLDialogElement) {
+        analysisHistoryConfirm.showModal();
+    }
+});
+document.querySelector('[data-analysis-history-close]')?.addEventListener('click', () => {
+    if (analysisHistoryConfirm instanceof HTMLDialogElement) {
+        analysisHistoryConfirm.close();
+    }
+});
+document.querySelector('[data-analysis-history-form]')?.addEventListener('submit', (event) => {
+    const button = event.currentTarget.querySelector('[data-analysis-history-submit]');
+    if (button) {
+        button.disabled = true;
+        button.textContent = 'Menyimpan…';
+    }
+});
+
+document.querySelectorAll('[data-analysis-history-success], [data-analysis-history-error]').forEach((dialog) => {
+    if (dialog instanceof HTMLDialogElement) {
+        dialog.showModal();
+    }
+});
+document.querySelector('[data-analysis-history-error-close]')?.addEventListener('click', () => {
+    const dialog = document.querySelector('[data-analysis-history-error]');
+    if (dialog instanceof HTMLDialogElement) {
+        dialog.close();
+    }
+});

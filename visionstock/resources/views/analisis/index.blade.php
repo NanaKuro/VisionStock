@@ -2,6 +2,21 @@
 
 @section('content')
     <div class="mx-auto w-full max-w-[1200px]">
+        @if (session('analysis_history_success'))
+            <dialog class="m-auto w-[min(92vw,739px)] rounded-card bg-brand-surface p-8 text-center text-brand-ink shadow-2xl backdrop:bg-black/45 sm:p-12" data-analysis-history-success>
+                <div class="mx-auto flex size-[clamp(6rem,14vw,10.25rem)] items-center justify-center rounded-full border-[5px] border-emerald-700 text-5xl text-emerald-700" aria-hidden="true">✓</div>
+                <h2 class="mt-6 text-2xl font-bold">{{ session('analysis_history_success') }}</h2>
+                <a class="mt-8 inline-flex min-h-11 items-center justify-center rounded-card bg-brand-primary px-8 py-3 font-bold text-white transition hover:brightness-95" href="{{ route('pengaturan.riwayat-analisis.index') }}">Selesai</a>
+            </dialog>
+        @endif
+        @if (session('analysis_history_error'))
+            <dialog class="m-auto w-[min(92vw,739px)] rounded-card bg-brand-surface p-8 text-center text-brand-ink shadow-2xl backdrop:bg-black/45 sm:p-12" data-analysis-history-error>
+                <div class="mx-auto flex size-[clamp(6rem,14vw,10.25rem)] items-center justify-center rounded-full border-[5px] border-brand-danger text-5xl text-brand-danger" aria-hidden="true">×</div>
+                <h2 class="mt-6 text-2xl font-bold">{{ session('analysis_history_error') }}</h2>
+                <button class="mt-8 min-h-11 rounded-card bg-brand-primary px-8 py-3 font-bold text-white transition hover:brightness-95" type="button" data-analysis-history-error-close>Coba lagi</button>
+            </dialog>
+        @endif
+
         @if ($products->isEmpty())
             <x-empty-state
                 heading="Data stok belum ada nih"
@@ -46,9 +61,20 @@
                 </div>
                 <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:gap-6">
                     <a class="inline-flex min-h-11 items-center justify-center rounded-card bg-brand-primary px-6 py-3 font-bold text-white transition hover:brightness-95" href="{{ route('stok.index') }}">Edit Stok</a>
-                    <a class="inline-flex min-h-11 items-center justify-center rounded-card bg-brand-primary px-6 py-3 font-bold text-white transition hover:brightness-95" href="{{ route('pengaturan.index', ['bagian' => 'whatsapp']) }}">Hubungkan ke WhatsApp</a>
+                    <button class="inline-flex min-h-11 items-center justify-center rounded-card bg-brand-primary px-6 py-3 font-bold text-white transition hover:brightness-95" type="button" data-analysis-history-open>Simpan Riwayat</button>
                 </div>
             </section>
         @endif
     </div>
+
+    @if (! $products->isEmpty())
+        <dialog class="m-auto w-[min(92vw,739px)] rounded-card bg-brand-surface p-6 text-center text-brand-ink shadow-2xl backdrop:bg-black/45 sm:p-12" aria-labelledby="analysis-history-confirm-heading" data-analysis-history-confirm>
+            <h2 class="text-2xl font-bold" id="analysis-history-confirm-heading">Ingin menyimpan analisis ini ke riwayat?</h2>
+            <form class="mt-8 flex flex-col justify-center gap-3 sm:flex-row sm:gap-6" action="{{ route('analisis.riwayat.store') }}" method="POST" data-analysis-history-form>
+                @csrf
+                <button class="min-h-11 rounded-card bg-brand-primary px-7 py-3 font-bold text-white transition hover:brightness-95" type="submit" data-analysis-history-submit>Simpan Riwayat</button>
+                <button class="min-h-11 rounded-card border border-brand-lineart/40 px-7 py-3 font-bold transition hover:bg-white/35" type="button" data-analysis-history-close>Batal</button>
+            </form>
+        </dialog>
+    @endif
 @endsection

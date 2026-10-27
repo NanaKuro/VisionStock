@@ -21,6 +21,7 @@ Cara memakai:
 1. Sebelum mengerjakan sebuah layar, **buka SVG yang tercantum** di bagian §4 layar tersebut, lalu baca rincian di `uiguide.md`.
 2. Jika SVG dan `uiguide.md` berbeda untuk hal **visual**, ikuti SVG/Figma dan catat selisihnya di §5. Untuk hal **perilaku** yang tidak digambar di SVG, ikuti `uiguide.md`.
 3. Jangan menambah atau menghilangkan elemen yang ada di SVG tanpa izin.
+4. **Pengecualian:** fitur WhatsApp sudah diganti **Riwayat Analisis**. SVG `Konfirmasi notif*.svg` dan `Pengaturan-2.svg` serta teks "Hubungkan ke WhatsApp" di `Pengaturan.svg` masih versi lama. Untuk layar/elemen tersebut, ambil **gaya visual** dari SVG dan **teks serta fungsi** dari `uiguide.md` (§4.7 dan §4.10).
 
 ---
 
@@ -144,9 +145,9 @@ Desain Figma hanya ada untuk lebar 1440 px, sehingga layout lebih kecil harus di
 
 ### 4.7 Analisis Stok (`Analisis Stok.svg`, `Konfirmasi notif*.svg`)
 - Judul seksi **"Stok Saat Ini"**; tabel 5 kolom: **No, Nama Produk, Sisa Stok, Rekomendasi Isi Stok, Tanggal**. Contoh baris: Tepung 20→25, Pena 30→35, Buku 25→30, Telur 45→50, Beras 10→20, Susu 30→35 (tanggal 1/1/2026).
-- Di bawah tabel: **Edit Stok** (145×52) dan **Kirim Notifikasi ke WhatsApp** (357×52), jarak 32.
-- Modal konfirmasi 739×286: teks **"Ingin Mengirim analisis ini ke WhatsApp?"** (h2) + tombol **Kirim Notifikasi ke WhatsApp** (357×52) dan **Batal** (111×52).
-- Modal sukses: judul **"Analisis berhasil dikirim"** + badge + satu tombol 130×52.
+- Di bawah tabel: **Edit Stok** (145×52) dan **Simpan Riwayat** (tinggi 52, padding 12×28, lebar mengikuti teks ±206), jarak 32. Tombol Simpan Riwayat menggantikan "Kirim Notifikasi ke WhatsApp".
+- Modal konfirmasi 739×286 (layout `Konfirmasi notif.svg`): teks **"Ingin menyimpan analisis ini ke riwayat?"** (h2) + tombol **Simpan Riwayat** (tinggi 52, lebar mengikuti teks) dan **Batal** (111×52). Selama proses simpan tombol Simpan Riwayat dinonaktifkan dan menampilkan indikator loading.
+- Modal sukses (layout `Konfirmasi notif-1.svg`): judul **"Riwayat analisis berhasil disimpan"** + badge + satu tombol 130×52. Jika gagal, modal yang sama memakai ikon X `danger` dan teks "Riwayat analisis gagal disimpan. Coba lagi." (state baru).
 
 ### 4.8 Riwayat Transaksi (`Riwayat Transaksi.svg`)
 - Top bar: Cari + **Impor Transaksi**.
@@ -159,9 +160,12 @@ Desain Figma hanya ada untuk lebar 1440 px, sehingga layout lebih kecil harus di
 - State unggah: "Data Transaksi.xlsx (77%)" → "(100%)". Modal sukses: **"Transaksi Berhasil Disimpan"**.
 
 ### 4.10 Pengaturan (`Pengaturan*.svg`)
-- Awal: judul **"Profil dan Akun"** + dua tombol lebar 511×46 (`secondary`, teks h5 putih, rata kiri): **Edit Profil**, **Hubungkan ke WhatsApp**.
+- Awal: judul **"Profil dan Akun"** + dua tombol lebar 511×46 (`secondary`, teks h5 putih, rata kiri): **Edit Profil**, **Riwayat Analisis** (menggantikan "Hubungkan ke WhatsApp").
 - **Edit Profil**: field lebar 945 — Nama, Email, Atur Ulang Password, Konfirmasi Password; tombol **Simpan** (152×38) dan **Kembali** (160×38).
-- **Hubungkan ke WhatsApp**: field **Nomor Telepon** (945); tombol **Kirim** (123×38) dan **Kembali** (160×38).
+- **Riwayat Analisis** (halaman baru, belum ada di Figma; sidebar tetap berjudul "Pengaturan", dibangun dari komponen yang sudah ada):
+  - *Daftar*: heading **"Riwayat Analisis"** (h4 `text`) + tabel lebar 880 dengan kolom **No, Tanggal & Jam Analisis, Jumlah Produk, Aksi**. Kolom Aksi berisi tombol kecil **Lihat Detail** (gaya tombol utama, teks 18 bold putih, tinggi 42). Urut dari yang terbaru.
+  - *Detail*: heading **"Detail Riwayat Analisis"** + tanggal & jam di bawahnya (text 16 `text`), lalu tabel yang sama persis dengan Analisis Stok (**No, Nama Produk, Sisa Stok, Rekomendasi Isi Stok, Tanggal**) dan tombol **Kembali** (160×38). Hanya-baca, tanpa tombol edit.
+  - *Kosong*: gaya empty state Data Stok: ikon X `danger`, judul **"Riwayat analisis belum ada"** (h2), teks **"Simpan hasil analisis dari halaman Analisis Stok."** (h4), tombol menuju Analisis Stok.
 
 ---
 
@@ -174,10 +178,11 @@ Desain Figma hanya ada untuk lebar 1440 px, sehingga layout lebih kecil harus di
 5. Dashboard menampilkan **Total Riwayat Transaksi** dan **Jumlah Transaksi** dengan angka sama (336). Tentukan apakah keduanya benar-benar berbeda metrik.
 6. Item sidebar tidak punya **state aktif** di desain; tambahkan penanda (mis. bg `secondary` lebih gelap atau garis kiri) dan tandai sebagai keputusan baru.
 7. Label tombol di modal sukses dan empty state tidak terbaca dari CSS; verifikasi di Figma.
+8. Teks WhatsApp di `Konfirmasi notif*.svg`, `Pengaturan.svg`, dan `Pengaturan-2.svg` perlu **diperbarui di Figma** (tombol Simpan Riwayat, modal konfirmasi/sukses, menu Riwayat Analisis). `Pengaturan-2.svg` tidak dipakai lagi.
 
 ### State yang belum ada di desain (perlu dibuat mengikuti gaya yang sama)
 - Empty state **Riwayat Transaksi** dan **Analisis Stok** (user flow menyebut keduanya).
-- Notifikasi **berhasil/gagal terhubung ke WhatsApp** dan **WhatsApp belum terhubung** saat kirim notifikasi.
+- Halaman **Riwayat Analisis** (daftar, detail, empty state) dan modal **gagal menyimpan riwayat**.
 - Error validasi pada form impor (file terlalu besar, format salah, baris Excel tidak valid) dan loading tabel.
 - Tampilan layar kecil/tablet (ditangani lewat aturan di §7, belum ada frame Figma-nya).
 
@@ -229,8 +234,8 @@ Padding halaman: `px-4` (ponsel) → `md:px-8` → `xl:px-16`. Jarak antar blok 
 - **Masuk / Registrasi**: `lg` ke atas dua kolom (foto 680 ÷ 1440 ≈ 47 % kiri, form kanan). Di bawah `lg` foto disembunyikan atau menjadi banner tipis di atas; form di tengah dengan `w-full max-w-[632px]` dan padding 16–32. Tombol Masuk/Daftar ditumpuk penuh lebar pada `< sm`.
 - **Dashboard**: `lg` = baris 1 sapaan (2/3) + kartu statistik (1/3), baris 2 tiga kartu; `md` = grid 2 kolom; `< sm` = 1 kolom. Kartu statistik memakai `aspect-[264/204]` atau tinggi minimum, bukan 204 px tetap.
 - **Data Stok**: kartu filter bergeser dari 3 kolom (`lg`) → 2 kolom (`md`) → 1 kolom (`< md`), dropdown `w-full`. Grid produk: `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3` (boleh `2xl:grid-cols-4`). Tombol Edit Stok `w-full` pada ponsel.
-- **Tabel (Analisis Stok & Riwayat Transaksi)**: bungkus dalam `overflow-x-auto` dengan `min-w` yang menjaga kolom tetap terbaca, header ikut tampil. Pada `< sm`, boleh diubah menjadi **daftar kartu** (tiap baris menjadi kartu dengan pasangan label : nilai). Kolom Invoice tetap berupa ikon yang bisa disentuh. Tombol di bawah tabel (Edit Stok, Kirim Notifikasi ke WhatsApp, Edit Transaksi) dibungkus (`flex-wrap`) dan menjadi penuh lebar pada ponsel.
-- **Form impor, Edit Stok, Edit Profil, Hubungkan WhatsApp**: semua input `w-full`. Baris berpasangan (Deskripsi + Unggah, Stok + Jenis Produk, Stok Terjual + Bukti Invoice) menjadi `flex-col` di bawah `md` dan `flex-row` mulai `md`. Tombol Simpan/Reset/Batal/Kembali boleh ditumpuk penuh lebar pada `< sm`.
+- **Tabel (Analisis Stok & Riwayat Transaksi)**: bungkus dalam `overflow-x-auto` dengan `min-w` yang menjaga kolom tetap terbaca, header ikut tampil. Pada `< sm`, boleh diubah menjadi **daftar kartu** (tiap baris menjadi kartu dengan pasangan label : nilai). Kolom Invoice tetap berupa ikon yang bisa disentuh. Tombol di bawah tabel (Edit Stok, Simpan Riwayat, Edit Transaksi) dibungkus (`flex-wrap`) dan menjadi penuh lebar pada ponsel.
+- **Form impor, Edit Stok, Edit Profil**: semua input `w-full`. Baris berpasangan (Deskripsi + Unggah, Stok + Jenis Produk, Stok Terjual + Bukti Invoice) menjadi `flex-col` di bawah `md` dan `flex-row` mulai `md`. Tombol Simpan/Reset/Batal/Kembali boleh ditumpuk penuh lebar pada `< sm`.
 - **Dropzone Excel**: lebar penuh; tombol Unggah dan teks bantu ditumpuk; nama file pada chip dipotong dengan `truncate` bila panjang.
 - **Modal**: `w-[min(92vw, 1073px)]` (untuk modal kecil `min(92vw, 739px)`), `max-h-[90dvh]` dengan `overflow-y-auto`, padding 16 (ponsel) → 64 (desktop). Tombol di dalam modal dibungkus dan menjadi tumpukan di ponsel. Fokus terkunci di dalam modal dan modal bisa ditutup dengan Esc.
 - **Empty state & badge sukses**: ukuran ikon fleksibel `clamp(120px, 20vw, 264px)` untuk ikon X, `clamp(96px, 14vw, 164px)` untuk badge.
