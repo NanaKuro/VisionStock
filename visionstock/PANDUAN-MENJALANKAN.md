@@ -44,37 +44,28 @@ Database lokal menggunakan SQLite (`database\database.sqlite`). Untuk lingkungan
 
 Pada halaman **Analisis Stok**, pilih **Simpan Riwayat** dan konfirmasikan untuk menyimpan snapshot stok serta rekomendasi. Daftar dan detail snapshot tersedia di **Pengaturan > Riwayat Analisis**. Riwayat tidak berubah saat data produk diperbarui.
 
-## Deploy ke Cloudflare
+## Deploy gratis ke Render
 
-VisionStock berjalan di **Cloudflare Workers + Containers**. Container menjalankan Laravel dengan Apache/PHP, sedangkan Worker meneruskan request ke container. Fitur Containers memerlukan **Workers Paid plan**. SQLite dan file lokal tidak persisten; siapkan database PostgreSQL/MySQL eksternal dan Cloudflare R2 sebelum deployment.
+VisionStock dapat dijalankan sebagai Docker Web Service pada **Render Free**. Paket gratis tidak memerlukan Workers Paid, tetapi layanan akan tidur setelah 15 menit tanpa trafik dan perlu sekitar satu menit untuk aktif kembali. Filesystem container bersifat sementara; jangan gunakan SQLite atau penyimpanan file lokal untuk data yang harus bertahan. Render Postgres Free juga kedaluwarsa setelah 30 hari, jadi gunakan penyedia PostgreSQL eksternal dengan free tier yang sesuai dan Cloudflare R2 (atau object storage S3-compatible lain) untuk unggahan. Periksa kuota dan ketentuan penyedia; jangan menambahkan metode pembayaran bila tidak ingin ada biaya.
 
-1. Hubungkan repository ke **Workers Builds**. Repository ini menyimpan aplikasi di subfolder `visionstock`, jadi atur **Root directory** ke `visionstock` (bukan root repository). Pengaturan ini penting agar Cloudflare menemukan `package.json`, `package-lock.json`, `wrangler.jsonc`, dan `Dockerfile`.
-2. Atur **Build command** kosong dan **Deploy command** ke `npm run deploy`. Pastikan lingkungan build memakai Node.js 22 atau lebih baru. Jangan gunakan `npx wrangler deploy` dari root repository; perintah itu tidak memasang dependensi project dan Wrangler tidak akan menemukan konfigurasi Worker di subfolder. Wrangler akan membangun frontend serta container image dari `Dockerfile`.
-3. Tambahkan Worker secrets berikut dengan perintah di folder `visionstock`:
-
-   ```powershell
-   npx wrangler secret put APP_KEY
-   npx wrangler secret put POSTGRES_URL
-   npx wrangler secret put AWS_ACCESS_KEY_ID
-   npx wrangler secret put AWS_SECRET_ACCESS_KEY
-   ```
-
-   Masukkan `APP_KEY` yang dihasilkan oleh `php artisan key:generate --show`. Database MySQL dapat memakai secret `MYSQL_URL` alih-alih `POSTGRES_URL`. Jangan mengganti `APP_KEY` setelah aplikasi mulai digunakan.
-4. Atur Worker variables melalui **Settings > Variables and Secrets**: `APP_URL`, `AWS_BUCKET`, `AWS_ENDPOINT`, dan `AWS_URL`. Untuk R2, `AWS_ENDPOINT` berformat `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`, region adalah `auto`, dan `AWS_URL` harus berupa public bucket URL atau custom domain R2. Atur juga database SSL sesuai kebutuhan penyedia.
-5. Jalankan migrasi **sekali** terhadap database production dari lingkungan yang memiliki akses ke database:
+1. Pastikan `render.yaml` di root repository terdeteksi Render Blueprint. Blueprint menunjuk ke `visionstock` sebagai root aplikasi dan memilih paket `free`.
+2. Siapkan PostgreSQL dan bucket object storage. Buat URL koneksi PostgreSQL yang menerima koneksi dari luar. Untuk R2, siapkan access key, secret key, nama bucket, endpoint `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`, dan public bucket URL/custom domain untuk `AWS_URL`.
+3. Saat membuat Blueprint, isi environment variables yang diminta Render:
+   - `APP_KEY`: hasil `php artisan key:generate --show` (buat sekali dan jangan diganti).
+   - `APP_URL`: URL service Render setelah service dibuat, misalnya `https://visionstock.onrender.com`.
+   - `DB_URL`: URL koneksi PostgreSQL eksternal.
+   - `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_BUCKET`, `AWS_ENDPOINT`, dan `AWS_URL`: nilai object storage yang sudah disiapkan.
+4. Setelah service berhasil dibuat, atur `APP_URL` ke URL publik sebenarnya pada **Environment** settings, lalu jalankan migrasi satu kali dari lingkungan lokal yang dapat mengakses database:
 
    ```powershell
    $env:APP_ENV = "production"
    $env:APP_KEY = "<nilai APP_KEY>"
    $env:DB_CONNECTION = "pgsql"
-   $env:DB_URL = "<nilai POSTGRES_URL>"
+   $env:DB_URL = "<nilai DB_URL>"
    composer install
    php artisan migrate --force
    ```
 
-   Untuk MySQL, ubah `DB_CONNECTION` menjadi `mysql` dan gunakan URL MySQL pada `DB_URL`.
-6. Deploy menggunakan Workers Builds atau jalankan `npm run deploy` dari folder project dengan Docker engine aktif dan Wrangler sudah login.
+5. Render membangun image dari `visionstock/Dockerfile`. Apache mendengarkan pada port `10000` dan health check menggunakan `/up`. Setelah deploy, buka URL `.onrender.com`; kunjungan pertama setelah layanan tidur mungkin memerlukan waktu hingga sekitar satu menit.
 
-Konfigurasi Wrangler berada di `wrangler.jsonc`; binding `VISIONSTOCK` mengarahkan request ke tiga instance stateless berbasis database dan R2. Jangan simpan secret di `wrangler.jsonc`, `.dev.vars`, atau repository. Setelah deploy, cek `https://<worker>.<subdomain>.workers.dev/up`. Jika container gagal start, periksa Worker logs dan Containers logs di Cloudflare Dashboard. Untuk menguji lokal, jalankan `npm run dev:cloudflare` dengan Docker engine aktif.
-
-Jika log Workers Builds menyebut `No dependencies detected` lalu `Could not detect a directory containing static files`, periksa **Root directory** pada pengaturan build: nilainya harus `visionstock`. Setelah mengubahnya, jalankan ulang deployment. Jika root directory memang harus tetap di root repository, gunakan build command `npm --prefix visionstock ci` dan deploy command `npm --prefix visionstock run deploy`, serta atur environment variable build `NODE_VERSION` ke `22`.
+Konfigurasi Blueprint berada di `render.yaml`. Untuk menghindari biaya tak disengaja, pantau kuota dan batas pemakaian di Render serta penyedia database/object storage. Paket gratis cocok untuk demo/pengujian, bukan aplikasi produksi dengan jaminan uptime atau persistensi data.
