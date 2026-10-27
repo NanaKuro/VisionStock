@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exports\StockTemplateExport;
 use App\Http\Requests\StockImportRequest;
 use App\Imports\StockImport;
+use App\Models\ProductCategory;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -22,7 +23,9 @@ class StockImportController extends Controller
 {
     public function index(): View
     {
-        return view('stok.import');
+        return view('stok.import', [
+            'categoryNames' => ProductCategory::PREDEFINED_NAMES,
+        ]);
     }
 
     public function template(): BinaryFileResponse

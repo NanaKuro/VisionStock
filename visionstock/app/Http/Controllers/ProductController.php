@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProductRequest;
+use App\Models\ProductCategory;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -59,6 +60,7 @@ class ProductController extends Controller
         return view('stok.index', [
             'products' => $products,
             'categories' => $user->productCategories()->orderBy('name')->get(),
+            'categoryNames' => ProductCategory::PREDEFINED_NAMES,
             'filters' => [
                 'search' => $filters['search'] ?? '',
                 'sort' => $sort,
@@ -117,6 +119,18 @@ class ProductController extends Controller
                 "users/{$user->id}/products",
                 'public',
             );
+        }
+
+        $categoryName = trim((string) ($data['category_name'] ?? ''));
+        $hasCategoryName = array_key_exists('category_name', $data);
+        unset($data['category_name']);
+
+        if ($categoryName !== '') {
+            $data['category_id'] = $user->productCategories()
+                ->firstOrCreate(['name' => $categoryName])
+                ->id;
+        } elseif ($hasCategoryName) {
+            $data['category_id'] = null;
         }
 
         unset($data['image']);

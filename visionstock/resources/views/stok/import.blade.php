@@ -111,7 +111,12 @@
                     </div>
                     <div>
                         <label class="mb-3 block text-lg font-bold" for="manual-product-category">Jenis Produk</label>
-                        <input class="h-[55px] w-full rounded-card border border-brand-lineart bg-transparent px-6 text-base outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/25" id="manual-product-category" name="category_name" type="text" value="{{ old('category_name') }}" maxlength="255">
+                        <select class="h-[55px] w-full rounded-card border border-brand-lineart bg-transparent px-6 text-base outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/25" id="manual-product-category" name="category_name">
+                            <option value="">Pilih jenis produk</option>
+                            @foreach ($categoryNames as $categoryName)
+                                <option value="{{ $categoryName }}" @selected(old('category_name') === $categoryName)>{{ $categoryName }}</option>
+                            @endforeach
+                        </select>
                         @error('category_name')
                             <p class="mt-1 text-sm font-medium text-brand-danger" role="alert">{{ $message }}</p>
                         @enderror

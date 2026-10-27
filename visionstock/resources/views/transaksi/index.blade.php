@@ -6,16 +6,16 @@
             <x-empty-state
                 heading="Riwayat transaksi belum ada nih"
                 message="Ayo lakukan input transaksi atau impor transaksi sebelumnya"
-            />
+            >
+                <x-slot:actions>
+                    <a class="inline-flex min-h-11 items-center justify-center rounded-card bg-brand-primary px-6 py-3 font-bold text-white transition hover:brightness-95" href="{{ route('transaksi.import') }}#excel-heading">Impor Excel</a>
+                    <a class="inline-flex min-h-11 items-center justify-center rounded-card border-2 border-brand-primary px-6 py-3 font-bold text-brand-ink transition hover:bg-white/30" href="{{ route('transaksi.import') }}#manual-heading">Input Manual</a>
+                </x-slot:actions>
+            </x-empty-state>
         @else
             <section aria-labelledby="transactions-heading">
                 <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
                     <h1 id="transactions-heading" class="text-[clamp(1.75rem,3.4vw,3rem)] font-bold tracking-tight">Riwayat Transaksi</h1>
-                    <form class="flex w-full gap-2 sm:w-auto" action="{{ route('transaksi.index') }}" method="GET">
-                        <label class="sr-only" for="transaction-search">Cari</label>
-                        <input class="h-11 min-w-0 flex-1 rounded-card border border-brand-lineart bg-transparent px-4 text-base placeholder:text-brand-muted focus:outline-2 focus:outline-brand-primary sm:w-56" id="transaction-search" name="search" type="search" value="{{ $filters['search'] }}" placeholder="Cari">
-                        <button class="min-h-11 rounded-card bg-brand-primary px-5 font-bold text-white" type="submit">Cari</button>
-                    </form>
                 </div>
 
                 <section class="mb-6 rounded-card bg-brand-primary p-5 text-white sm:p-8" aria-label="Urutkan riwayat transaksi">

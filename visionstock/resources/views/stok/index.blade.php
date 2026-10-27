@@ -136,7 +136,7 @@
                                     data-name="{{ $product->name }}"
                                     data-description="{{ $product->description }}"
                                     data-stock="{{ $product->stock }}"
-                                    data-category="{{ $product->category_id }}"
+                                    data-category-name="{{ $product->category?->name }}"
                                     data-image="{{ $product->image_path ? Storage::disk('public')->url($product->image_path) : '' }}"
                                 >
                                     Edit Stok
@@ -219,13 +219,13 @@
                     </div>
                     <div>
                         <label class="mb-3 block text-lg font-bold" for="product-category">Jenis Produk</label>
-                        <select class="h-[55px] w-full rounded border border-brand-lineart bg-white/35 px-6 text-base outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/25" id="product-category" name="category_id">
+                        <select class="h-[55px] w-full rounded border border-brand-lineart bg-white/35 px-6 text-base outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/25" id="product-category" name="category_name">
                             <option value="">Pilih jenis produk</option>
-                            @foreach ($categories as $category)
-                                <option value="{{ $category->id }}" @selected((string) old('category_id') === (string) $category->id)>{{ $category->name }}</option>
+                            @foreach ($categoryNames as $categoryName)
+                                <option value="{{ $categoryName }}" @selected(old('category_name') === $categoryName)>{{ $categoryName }}</option>
                             @endforeach
                         </select>
-                        @error('category_id')
+                        @error('category_name')
                             <p class="mt-1 text-sm font-medium text-brand-danger" role="alert">{{ $message }}</p>
                         @enderror
                     </div>

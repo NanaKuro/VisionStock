@@ -7,6 +7,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\StockImportController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\TransactionImportController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'landing')->name('home');
@@ -35,6 +36,10 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/analisis', [AnalysisController::class, 'index'])->name('analisis.index');
     Route::get('/transaksi', [TransactionController::class, 'index'])->name('transaksi.index');
+    Route::get('/transaksi/impor', [TransactionImportController::class, 'index'])->name('transaksi.import');
+    Route::post('/transaksi/impor', [TransactionImportController::class, 'import'])->name('transaksi.import.store');
+    Route::post('/transaksi/impor/manual', [TransactionImportController::class, 'store'])->name('transaksi.import.manual');
+    Route::get('/transaksi/impor/template', [TransactionImportController::class, 'template'])->name('transaksi.import.template');
     Route::get('/pengaturan', [SettingsController::class, 'index'])->name('pengaturan.index');
     Route::put('/pengaturan/profil', [SettingsController::class, 'updateProfile'])->name('pengaturan.profil.update');
     Route::put('/pengaturan/whatsapp', [SettingsController::class, 'saveWhatsAppNumber'])->name('pengaturan.whatsapp.save');

@@ -8,6 +8,16 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ProductCategory extends Model
 {
+    public const PREDEFINED_NAMES = [
+        'Alat Tulis',
+        'Bahan Baku Makanan',
+        'Buku',
+        'Minuman',
+        'Makanan',
+        'Perlengkapan Rumah Tangga',
+        'Barang lainnya',
+    ];
+
     protected $fillable = [
         'user_id',
         'name',

@@ -58,6 +58,20 @@
                         </button>
                         <a class="inline-flex min-h-11 items-center justify-center rounded-card bg-brand-surface px-3 text-sm font-bold text-brand-ink transition hover:bg-white sm:px-5 sm:text-base" href="{{ route('stok.import') }}">Impor Stok</a>
                     </form>
+                @elseif (request()->routeIs('transaksi.index'))
+                    <form class="ml-auto flex items-center gap-2 sm:gap-4" action="{{ route('transaksi.index') }}" method="GET">
+                        <label class="sr-only" for="topbar-transaction-search">Cari transaksi</label>
+                        <input
+                            class="h-11 w-36 rounded-card border border-brand-lineart/25 bg-brand-surface px-3 text-base text-brand-ink placeholder:text-brand-muted focus:outline-2 focus:outline-offset-2 focus:outline-white sm:w-56"
+                            id="topbar-transaction-search"
+                            name="search"
+                            type="search"
+                            value="{{ request('search') }}"
+                            placeholder="Cari"
+                        >
+                        <button class="inline-flex min-h-11 items-center justify-center rounded-card bg-brand-surface px-4 text-base font-bold text-brand-ink transition hover:bg-white" type="submit">Cari</button>
+                        <a class="inline-flex min-h-11 items-center justify-center rounded-card bg-brand-surface px-3 text-sm font-bold text-brand-ink transition hover:bg-white sm:px-5 sm:text-base" href="{{ route('transaksi.import') }}">Impor Transaksi</a>
+                    </form>
                 @endif
             </header>
 
