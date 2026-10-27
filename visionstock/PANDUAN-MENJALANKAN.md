@@ -48,8 +48,8 @@ Pada halaman **Analisis Stok**, pilih **Simpan Riwayat** dan konfirmasikan untuk
 
 VisionStock berjalan di **Cloudflare Workers + Containers**. Container menjalankan Laravel dengan Apache/PHP, sedangkan Worker meneruskan request ke container. Fitur Containers memerlukan **Workers Paid plan**. SQLite dan file lokal tidak persisten; siapkan database PostgreSQL/MySQL eksternal dan Cloudflare R2 sebelum deployment.
 
-1. Hubungkan repository ke **Workers Builds** dan atur **Root directory** ke folder `visionstock`.
-2. Pastikan build menggunakan Node.js 22 atau lebih baru, deploy command `npm run deploy` (atau `npx wrangler deploy`), dan build command kosong. Wrangler membangun frontend serta container image dari `Dockerfile`.
+1. Hubungkan repository ke **Workers Builds**. Repository ini menyimpan aplikasi di subfolder `visionstock`, jadi atur **Root directory** ke `visionstock` (bukan root repository). Pengaturan ini penting agar Cloudflare menemukan `package.json`, `package-lock.json`, `wrangler.jsonc`, dan `Dockerfile`.
+2. Atur **Build command** kosong dan **Deploy command** ke `npm run deploy`. Pastikan lingkungan build memakai Node.js 22 atau lebih baru. Jangan gunakan `npx wrangler deploy` dari root repository; perintah itu tidak memasang dependensi project dan Wrangler tidak akan menemukan konfigurasi Worker di subfolder. Wrangler akan membangun frontend serta container image dari `Dockerfile`.
 3. Tambahkan Worker secrets berikut dengan perintah di folder `visionstock`:
 
    ```powershell
@@ -76,3 +76,5 @@ VisionStock berjalan di **Cloudflare Workers + Containers**. Container menjalank
 6. Deploy menggunakan Workers Builds atau jalankan `npm run deploy` dari folder project dengan Docker engine aktif dan Wrangler sudah login.
 
 Konfigurasi Wrangler berada di `wrangler.jsonc`; binding `VISIONSTOCK` mengarahkan request ke tiga instance stateless berbasis database dan R2. Jangan simpan secret di `wrangler.jsonc`, `.dev.vars`, atau repository. Setelah deploy, cek `https://<worker>.<subdomain>.workers.dev/up`. Jika container gagal start, periksa Worker logs dan Containers logs di Cloudflare Dashboard. Untuk menguji lokal, jalankan `npm run dev:cloudflare` dengan Docker engine aktif.
+
+Jika log Workers Builds menyebut `No dependencies detected` lalu `Could not detect a directory containing static files`, periksa **Root directory** pada pengaturan build: nilainya harus `visionstock`. Setelah mengubahnya, jalankan ulang deployment. Jika root directory memang harus tetap di root repository, gunakan build command `npm --prefix visionstock ci` dan deploy command `npm --prefix visionstock run deploy`, serta atur environment variable build `NODE_VERSION` ke `22`.
