@@ -18,7 +18,10 @@ return [
     |
     */
 
-    'driver' => env('SESSION_DRIVER', 'database'),
+    'driver' => env(
+        'SESSION_DRIVER',
+        env('APP_ENV', 'production') === 'production' ? 'cookie' : 'database',
+    ),
 
     /*
     |--------------------------------------------------------------------------
@@ -169,7 +172,10 @@ return [
     |
     */
 
-    'secure' => env('SESSION_SECURE_COOKIE'),
+    'secure' => env(
+        'SESSION_SECURE_COOKIE',
+        env('APP_ENV', 'production') === 'production',
+    ),
 
     /*
     |--------------------------------------------------------------------------
