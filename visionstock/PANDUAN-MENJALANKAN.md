@@ -43,3 +43,27 @@ Database lokal menggunakan SQLite (`database\database.sqlite`). Untuk lingkungan
 ## Riwayat Analisis
 
 Pada halaman **Analisis Stok**, pilih **Simpan Riwayat** dan konfirmasikan untuk menyimpan snapshot stok serta rekomendasi. Daftar dan detail snapshot tersedia di **Pengaturan > Riwayat Analisis**. Riwayat tidak berubah saat data produk diperbarui.
+
+## Deploy ke Vercel
+
+Project ini memakai Vercel Container Runtime melalui `Dockerfile.vercel`. Database SQLite dan penyimpanan file lokal tidak cocok untuk deployment karena filesystem instance Vercel tidak persisten. Siapkan database PostgreSQL atau MySQL eksternal dan bucket S3-compatible sebelum deploy.
+
+1. Import repository ke Vercel dan pastikan **Root Directory** menunjuk ke folder `visionstock` (folder yang berisi `Dockerfile.vercel`).
+2. Buat database PostgreSQL/MySQL dan bucket S3-compatible. Bucket harus dapat menyajikan file gambar produk dan invoice melalui URL publik, sesuai perilaku aplikasi saat ini.
+3. Isi Environment Variables berikut di **Project Settings > Environment Variables** untuk Production, Preview, dan Development sesuai kebutuhan:
+   - `APP_NAME=VisionStock`, `APP_ENV=production`, `APP_DEBUG=false`, dan `APP_URL` dengan URL deployment.
+   - `APP_KEY` dari `php artisan key:generate --show`; jangan mengganti key setelah pengguna mulai memakai aplikasi.
+   - `DB_CONNECTION=pgsql` (atau `mysql`), `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, dan `DB_PASSWORD`. Untuk PostgreSQL, gunakan `DB_SSLMODE=require` bila diwajibkan penyedia database.
+   - `SESSION_DRIVER=cookie`, `SESSION_SECURE_COOKIE=true`, `CACHE_STORE=array`, `QUEUE_CONNECTION=sync`, dan `LOG_CHANNEL=stderr`.
+   - `FILESYSTEM_DISK=s3`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_DEFAULT_REGION`, `AWS_BUCKET`, dan jika diperlukan `AWS_URL`, `AWS_ENDPOINT`, serta `AWS_USE_PATH_STYLE_ENDPOINT`.
+4. Jalankan migrasi satu kali pada database produksi sebelum aplikasi dipakai. Contoh dari PowerShell setelah memasang Vercel CLI dan mengisi environment Production:
+
+   ```powershell
+   vercel env pull .env.production --environment production
+   composer install
+   php artisan migrate --env=production --force
+   ```
+
+5. Deploy dari Vercel atau jalankan `vercel --prod`.
+
+Contoh variabel tersedia di `.env.vercel.example`. Jangan commit nilai rahasia atau file `.env.production`. Vercel membangun aset frontend dan dependensi PHP dari Dockerfile; tidak perlu mengisi Build Command atau Output Directory manual. Untuk menguji image secara lokal, jalankan `docker build -f Dockerfile.vercel -t visionstock .` dari folder project dengan Docker engine aktif.
