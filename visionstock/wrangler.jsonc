@@ -1,0 +1,46 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "visionstock",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-10-27",
+  "workers_dev": true,
+  "observability": {
+    "enabled": true
+  },
+  "containers": [
+    {
+      "class_name": "VisionStockContainer",
+      "image": "./Dockerfile",
+      "instance_type": "basic",
+      "max_instances": 3
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "VISIONSTOCK",
+        "class_name": "VisionStockContainer"
+      }
+    ]
+  },
+  "exports": {
+    "VisionStockContainer": {
+      "type": "durable-object",
+      "storage": "sqlite"
+    }
+  },
+  "vars": {
+    "APP_NAME": "VisionStock",
+    "APP_ENV": "production",
+    "APP_DEBUG": "false",
+    "DB_CONNECTION": "pgsql",
+    "DB_SSLMODE": "require",
+    "SESSION_DRIVER": "cookie",
+    "SESSION_SECURE_COOKIE": "true",
+    "CACHE_STORE": "array",
+    "QUEUE_CONNECTION": "sync",
+    "FILESYSTEM_DISK": "s3",
+    "AWS_DEFAULT_REGION": "auto",
+    "AWS_USE_PATH_STYLE_ENDPOINT": "true"
+  }
+}

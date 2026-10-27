@@ -44,26 +44,35 @@ Database lokal menggunakan SQLite (`database\database.sqlite`). Untuk lingkungan
 
 Pada halaman **Analisis Stok**, pilih **Simpan Riwayat** dan konfirmasikan untuk menyimpan snapshot stok serta rekomendasi. Daftar dan detail snapshot tersedia di **Pengaturan > Riwayat Analisis**. Riwayat tidak berubah saat data produk diperbarui.
 
-## Deploy ke Vercel
+## Deploy ke Cloudflare
 
-Project ini memakai Vercel Container Runtime melalui `Dockerfile.vercel`. Database SQLite dan penyimpanan file lokal tidak cocok untuk deployment karena filesystem instance Vercel tidak persisten. Siapkan database PostgreSQL atau MySQL eksternal dan bucket S3-compatible sebelum deploy.
+VisionStock berjalan di **Cloudflare Workers + Containers**. Container menjalankan Laravel dengan Apache/PHP, sedangkan Worker meneruskan request ke container. Fitur Containers memerlukan **Workers Paid plan**. SQLite dan file lokal tidak persisten; siapkan database PostgreSQL/MySQL eksternal dan Cloudflare R2 sebelum deployment.
 
-1. Import repository ke Vercel dan pastikan **Root Directory** menunjuk ke folder `visionstock` (folder yang berisi `vercel.json` dan `Dockerfile.vercel`). `vercel.json` menetapkan Framework Preset ke `container`, agar Vercel tidak menjalankan build statis Vite atau mencari folder `dist`.
-2. Buat database PostgreSQL/MySQL dan bucket S3-compatible. Bucket harus dapat menyajikan file gambar produk dan invoice melalui URL publik, sesuai perilaku aplikasi saat ini.
-3. Isi Environment Variables berikut di **Project Settings > Environment Variables** untuk Production, Preview, dan Development sesuai kebutuhan:
-   - `APP_NAME=VisionStock`, `APP_ENV=production`, `APP_DEBUG=false`, dan `APP_URL` dengan URL deployment.
-   - `APP_KEY` dari `php artisan key:generate --show`; jangan mengganti key setelah pengguna mulai memakai aplikasi.
-   - PostgreSQL: `DB_CONNECTION=pgsql` dan `POSTGRES_URL` dari penyedia database (atau isi `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, dan `DB_PASSWORD`). Untuk MySQL, gunakan `DB_CONNECTION=mysql` dan `MYSQL_URL` atau variabel koneksi terpisah. Untuk PostgreSQL, gunakan `DB_SSLMODE=require` bila diwajibkan penyedia database.
-   - `SESSION_DRIVER=cookie`, `SESSION_SECURE_COOKIE=true`, `CACHE_STORE=array`, `QUEUE_CONNECTION=sync`, dan `LOG_CHANNEL=stderr`.
-   - `FILESYSTEM_DISK=s3`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_DEFAULT_REGION`, `AWS_BUCKET`, dan jika diperlukan `AWS_URL`, `AWS_ENDPOINT`, serta `AWS_USE_PATH_STYLE_ENDPOINT`.
-4. Jalankan migrasi satu kali pada database produksi sebelum aplikasi dipakai. Contoh dari PowerShell setelah memasang Vercel CLI dan mengisi environment Production:
+1. Hubungkan repository ke **Workers Builds** dan atur **Root directory** ke folder `visionstock`.
+2. Pastikan build menggunakan Node.js 22 atau lebih baru, deploy command `npm run deploy` (atau `npx wrangler deploy`), dan build command kosong. Wrangler membangun frontend serta container image dari `Dockerfile`.
+3. Tambahkan Worker secrets berikut dengan perintah di folder `visionstock`:
 
    ```powershell
-   vercel env pull .env.production --environment production
-   composer install
-   php artisan migrate --env=production --force
+   npx wrangler secret put APP_KEY
+   npx wrangler secret put POSTGRES_URL
+   npx wrangler secret put AWS_ACCESS_KEY_ID
+   npx wrangler secret put AWS_SECRET_ACCESS_KEY
    ```
 
-5. Deploy dari Vercel atau jalankan `vercel --prod`.
+   Masukkan `APP_KEY` yang dihasilkan oleh `php artisan key:generate --show`. Database MySQL dapat memakai secret `MYSQL_URL` alih-alih `POSTGRES_URL`. Jangan mengganti `APP_KEY` setelah aplikasi mulai digunakan.
+4. Atur Worker variables melalui **Settings > Variables and Secrets**: `APP_URL`, `AWS_BUCKET`, `AWS_ENDPOINT`, dan `AWS_URL`. Untuk R2, `AWS_ENDPOINT` berformat `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`, region adalah `auto`, dan `AWS_URL` harus berupa public bucket URL atau custom domain R2. Atur juga database SSL sesuai kebutuhan penyedia.
+5. Jalankan migrasi **sekali** terhadap database production dari lingkungan yang memiliki akses ke database:
 
-Contoh variabel tersedia di `.env.vercel.example`. Di environment production, aplikasi kini memilih PostgreSQL, session cookie aman, cache array, dan queue sinkron secara default agar tidak bergantung pada file SQLite lokal atau tabel session/cache/jobs. Kredensial database tetap wajib diatur; `POSTGRES_URL` dan `MYSQL_URL` didukung untuk mengisi URL koneksi langsung. Jangan commit nilai rahasia atau file `.env.production`. Vercel membangun aset frontend dan dependensi PHP dari Dockerfile; tidak perlu mengisi Build Command atau Output Directory manual. Untuk menguji image secara lokal, jalankan `docker build -f Dockerfile.vercel -t visionstock .` dari folder project dengan Docker engine aktif.
+   ```powershell
+   $env:APP_ENV = "production"
+   $env:APP_KEY = "<nilai APP_KEY>"
+   $env:DB_CONNECTION = "pgsql"
+   $env:DB_URL = "<nilai POSTGRES_URL>"
+   composer install
+   php artisan migrate --force
+   ```
+
+   Untuk MySQL, ubah `DB_CONNECTION` menjadi `mysql` dan gunakan URL MySQL pada `DB_URL`.
+6. Deploy menggunakan Workers Builds atau jalankan `npm run deploy` dari folder project dengan Docker engine aktif dan Wrangler sudah login.
+
+Konfigurasi Wrangler berada di `wrangler.jsonc`; binding `VISIONSTOCK` mengarahkan request ke tiga instance stateless berbasis database dan R2. Jangan simpan secret di `wrangler.jsonc`, `.dev.vars`, atau repository. Setelah deploy, cek `https://<worker>.<subdomain>.workers.dev/up`. Jika container gagal start, periksa Worker logs dan Containers logs di Cloudflare Dashboard. Untuk menguji lokal, jalankan `npm run dev:cloudflare` dengan Docker engine aktif.
