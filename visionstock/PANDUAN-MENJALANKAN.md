@@ -44,28 +44,19 @@ Database lokal menggunakan SQLite (`database\database.sqlite`). Untuk lingkungan
 
 Pada halaman **Analisis Stok**, pilih **Simpan Riwayat** dan konfirmasikan untuk menyimpan snapshot stok serta rekomendasi. Daftar dan detail snapshot tersedia di **Pengaturan > Riwayat Analisis**. Riwayat tidak berubah saat data produk diperbarui.
 
-## Deploy ke Railway
+## Deploy ke Netlify
 
-Railway akan membangun Docker image dari `Dockerfile` di folder aplikasi. Karena aplikasi berada di subfolder repository, atur **Root Directory** service ke `/visionstock`; biarkan Railway mendeteksi Dockerfile secara otomatis. Container mendengarkan pada nilai `PORT` yang diberikan Railway (default `8080`) dan menyediakan health endpoint Laravel `/up`.
+Aplikasi Netlify menggunakan frontend statis Vite dan Netlify Functions, bukan Laravel/PHP. Konfigurasi root `netlify.toml` sudah menetapkan base directory `visionstock`, build command, direktori publish `dist`, Node.js 22, dan routing SPA/API. Saat menghubungkan repository, pilih repository ini dan biarkan pengaturan build dibaca dari `netlify.toml`; jangan menambahkan build command atau publish directory lain di dashboard.
 
-1. Buat project Railway dan tambahkan service dari repository GitHub ini. Pada **Settings > Source**, atur **Root Directory** ke `/visionstock`. Jangan mengisi build atau start command khusus; gunakan Dockerfile dan perintah `CMD` yang sudah disediakan.
-2. Pada **Settings > Networking**, buat domain publik untuk service. Atur variabel berikut pada tab **Variables**:
-   - `APP_ENV=production` dan `APP_DEBUG=false`.
-   - `APP_KEY`: hasil `php artisan key:generate --show` (buat sekali dan jangan diganti).
-   - `APP_URL`: URL publik Railway, misalnya `https://<domain-service>.up.railway.app`.
-   - `DB_CONNECTION=pgsql`, `DB_SSLMODE=require`, dan `DB_URL`: URL PostgreSQL dari database Railway atau penyedia eksternal.
-   - `SESSION_DRIVER=cookie`, `SESSION_SECURE_COOKIE=true`, `CACHE_STORE=array`, dan `QUEUE_CONNECTION=sync`.
-   - Untuk berkas unggahan persisten, atur `FILESYSTEM_DISK=s3`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_BUCKET`, `AWS_ENDPOINT`, `AWS_URL`, `AWS_DEFAULT_REGION=auto`, dan `AWS_USE_PATH_STYLE_ENDPOINT=true` sesuai bucket R2/S3-compatible. Jangan mengandalkan filesystem container untuk menyimpan berkas.
-3. Pada pengaturan **Healthcheck Path**, isi `/up`. Pastikan Railway menggunakan port dari variabel `PORT`; Dockerfile mengatur Apache mengikuti port tersebut.
-4. Deploy service, lalu jalankan migrasi **satu kali** terhadap database yang dikonfigurasi dari lingkungan lokal yang memiliki Composer serta akses jaringan ke database:
+1. Buat site baru dari repository GitHub ini. Pastikan base directory tetap `visionstock` (sudah dikonfigurasi melalui `netlify.toml`) dan build menggunakan `npm ci && npm run build`.
+2. Aktifkan **Netlify Database** pada site. Netlify menerapkan file migrasi di `netlify/database/migrations/` secara otomatis saat deploy. Database ini memakai credits pada paket credit-based; cek billing dan batas penggunaan Netlify sebelum mengaktifkannya.
+3. Tambahkan environment variable `APP_SESSION_SECRET` di pengaturan site, minimal 32 karakter acak. Contoh membuat nilai di PowerShell:
 
    ```powershell
-   $env:APP_ENV = "production"
-   $env:APP_KEY = "<nilai APP_KEY>"
-   $env:DB_CONNECTION = "pgsql"
-   $env:DB_URL = "<nilai DB_URL>"
-   composer install
-   php artisan migrate --force
+   node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
    ```
 
-5. Setelah migrasi selesai, buka domain Railway dan periksa log service bila health check atau startup gagal. Paket, kuota, dan biaya Railway bergantung pada akun dan pemakaian; periksa halaman billing Railway dan layanan database/object storage yang digunakan.
+   Simpan nilainya sebagai secret di dashboard, jangan masukkan ke repository. Netlify menyediakan `NETLIFY_DB_URL` ketika Netlify Database aktif. Untuk upload gambar dan invoice, Netlify Blobs akan digunakan oleh Functions; periksa kuota/credits sesuai paket Netlify.
+4. Deploy site. Buka URL utama, coba daftar/masuk, lalu verifikasi dashboard, stok, impor, transaksi, analisis, dan profil. Jika gagal, periksa log Functions dan pastikan Database aktif serta `APP_SESSION_SECRET` terpasang.
+
+Impor Excel menerima `.xlsx` maksimal 4 MB dan 500 baris. Gambar/invoice dibatasi 3,5 MB karena batas payload Functions Netlify. Penggunaan Database, Functions, dan Blobs dapat mengonsumsi credits atau tunduk pada batas paket.
