@@ -1,4 +1,4 @@
-import '../css/app.css';
+import '../css/netlify.css';
 
 const app = document.querySelector('#app');
 const path = window.location.pathname.replace(/\/+$/, '') || '/';
