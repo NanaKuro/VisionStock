@@ -19,6 +19,7 @@
     "dependencies": {
         "@e965/xlsx": "^0.20.3",
         "@netlify/blobs": "^11.1.6",
+        "@netlify/database": "^2.0.3",
         "bcryptjs": "^3.0.3",
         "postgres": "^3.4.9"
     },

@@ -1,4 +1,5 @@
 import { getStore } from "@netlify/blobs";
+import { getConnectionString } from "@netlify/database";
 import bcrypt from "bcryptjs";
 import { createHmac, randomBytes, randomUUID, timingSafeEqual } from "node:crypto";
 import postgres from "postgres";
@@ -22,19 +23,54 @@ const MIME_TYPES = new Map([
     [".pdf", "application/pdf"],
 ]);
 let database;
+let databaseConnectionString;
+
+function readConnectionString() {
+    // Netlify injects the database URL into the function runtime environment
+    // (Netlify.env), not necessarily into process.env. getConnectionString()
+    // reads from the correct place for the current runtime.
+    try {
+        return getConnectionString();
+    } catch {
+        return process.env.NETLIFY_DB_URL || null;
+    }
+}
+
+function toPostgresJsUrl(connectionString) {
+    // postgres.js forwards unknown query params to the server as session
+    // settings, which makes Postgres reject libpq-only options such as
+    // channel_binding. Strip them and configure SSL via options instead.
+    try {
+        const url = new URL(connectionString);
+        url.searchParams.delete("channel_binding");
+        url.searchParams.delete("sslmode");
+        return url.toString();
+    } catch {
+        return connectionString;
+    }
+}
 
 function getDatabase() {
-    const connectionString = process.env.NETLIFY_DB_URL;
+    const connectionString = readConnectionString();
     if (!connectionString) {
-        throw new HttpError(503, "Netlify Database belum dihubungkan ke site ini.");
+        throw new HttpError(
+            503,
+            "Netlify Database belum tersedia untuk deploy ini. Aktifkan Netlify Database pada site, lalu jalankan deploy ulang.",
+        );
     }
 
-    database ??= postgres(connectionString, {
-        max: 1,
-        idle_timeout: 20,
-        connect_timeout: 10,
-        ssl: "require",
-    });
+    // Credentials can be rotated by the platform; reconnect when they change.
+    if (!database || databaseConnectionString !== connectionString) {
+        const previous = database;
+        database = postgres(toPostgresJsUrl(connectionString), {
+            max: 1,
+            idle_timeout: 20,
+            connect_timeout: 10,
+            ssl: "require",
+        });
+        databaseConnectionString = connectionString;
+        previous?.end({ timeout: 5 }).catch(() => {});
+    }
 
     return database;
 }
