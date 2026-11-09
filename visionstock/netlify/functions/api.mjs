@@ -53,7 +53,10 @@ function toPostgresJsUrl(connectionString) {
 function getDatabase() {
     const connectionString = readConnectionString();
     if (!connectionString) {
-        throw new HttpError(503, "Netlify Database belum dihubungkan ke site ini.");
+        throw new HttpError(
+            503,
+            "Netlify Database belum tersedia untuk deploy ini. Aktifkan Netlify Database pada site, lalu jalankan deploy ulang.",
+        );
     }
 
     // Credentials can be rotated by the platform; reconnect when they change.

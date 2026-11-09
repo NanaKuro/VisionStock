@@ -49,7 +49,7 @@ Pada halaman **Analisis Stok**, pilih **Simpan Riwayat** dan konfirmasikan untuk
 Aplikasi Netlify menggunakan frontend statis Vite dan Netlify Functions, bukan Laravel/PHP. Konfigurasi root `netlify.toml` sudah menetapkan base directory `visionstock`, build command, direktori publish `dist`, Node.js 22, dan routing SPA/API. Saat menghubungkan repository, pilih repository ini dan biarkan pengaturan build dibaca dari `netlify.toml`; jangan menambahkan build command atau publish directory lain di dashboard.
 
 1. Buat site baru dari repository GitHub ini. Pastikan base directory tetap `visionstock` (sudah dikonfigurasi melalui `netlify.toml`) dan build menggunakan `npm ci && npm run build`.
-2. Aktifkan **Netlify Database** pada site. Netlify menerapkan file migrasi di `netlify/database/migrations/` secara otomatis saat deploy. Database ini memakai credits pada paket credit-based; cek billing dan batas penggunaan Netlify sebelum mengaktifkannya.
+2. Aktifkan **Netlify Database** pada site. Netlify menerapkan file migrasi di `netlify/database/migrations/` secara otomatis saat deploy dan menyediakan `NETLIFY_DB_URL` untuk Functions. Setelah mengaktifkannya, jalankan production deploy baru. Jika login/API masih mengembalikan HTTP 503 yang menyebut database belum tersedia, pastikan database terhubung ke site dan deploy yang dipublikasikan adalah production deploy. Database ini memakai credits pada paket credit-based; cek billing dan batas penggunaan Netlify sebelum mengaktifkannya.
 3. Tambahkan environment variable `APP_SESSION_SECRET` di pengaturan site, minimal 32 karakter acak. Contoh membuat nilai di PowerShell:
 
    ```powershell
@@ -57,6 +57,6 @@ Aplikasi Netlify menggunakan frontend statis Vite dan Netlify Functions, bukan L
    ```
 
    Simpan nilainya sebagai secret di dashboard, jangan masukkan ke repository. Netlify menyediakan `NETLIFY_DB_URL` ketika Netlify Database aktif. Untuk upload gambar dan invoice, Netlify Blobs akan digunakan oleh Functions; periksa kuota/credits sesuai paket Netlify.
-4. Deploy site. Buka URL utama, coba daftar/masuk, lalu verifikasi dashboard, stok, impor, transaksi, analisis, dan profil. Jika gagal, periksa log Functions dan pastikan Database aktif serta `APP_SESSION_SECRET` terpasang.
+4. Deploy site. Buka URL utama dan verifikasi `GET /api/auth/me` mengembalikan HTTP 401 saat belum login (bukan 503). Lalu coba daftar/masuk dan verifikasi dashboard, stok, impor, transaksi, analisis, dan profil. Jika gagal, periksa log Functions dan pastikan Database aktif serta `APP_SESSION_SECRET` terpasang.
 
 Impor Excel menerima `.xlsx` maksimal 4 MB dan 500 baris. Gambar/invoice dibatasi 3,5 MB karena batas payload Functions Netlify. Penggunaan Database, Functions, dan Blobs dapat mengonsumsi credits atau tunduk pada batas paket.
